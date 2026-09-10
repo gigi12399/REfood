@@ -1,0 +1,1796 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>REfood — product flow demo</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* ---------- tokens ---------- */
+:root{
+  --primary:#14B8A6;
+  --primary-dark:#0E9484;
+  --primary-darker:#0B7A6A;
+  --secondary:#5EEAD4;
+  --tint:#DFF5EF;
+  --bg:#F7FBF9;
+  --surface:#FFFFFF;
+  --coral:#FF8F6B;
+  --coral-dark:#E8703F;
+  --text:#2E4A44;
+  --muted:#6E8681;
+  --border:#DCEEE8;
+  --danger:#E24B4A;
+  --danger-tint:#FAECE7;
+  --danger-text:#712B13;
+  --amber:#BA7517;
+  --amber-tint:#FAEEDA;
+  --green-ok:#27500A;
+  --green-ok-tint:#EAF3DE;
+  --radius-lg:22px;
+  --radius-md:16px;
+  --radius-sm:10px;
+  --shadow:0 2px 10px rgba(20,60,50,0.06);
+  --shadow-lift:0 8px 24px rgba(20,60,50,0.12);
+}
+[data-theme="dark"]{
+  --bg:#0E1F1B;
+  --surface:#163029;
+  --tint:#1B3D34;
+  --text:#EAF6F1;
+  --muted:#8FADA5;
+  --border:#20443A;
+  --danger-tint:#3A1F1D;
+  --danger-text:#F3A38F;
+  --amber-tint:#3A2E12;
+  --amber:#F2C265;
+  --green-ok-tint:#1E3418;
+  --green-ok:#B4E08C;
+  --shadow:0 2px 10px rgba(0,0,0,0.25);
+  --shadow-lift:0 10px 28px rgba(0,0,0,0.4);
+}
+*{box-sizing:border-box;}
+body{margin:0;font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;}
+h1,h2,h3,h4{margin:0;font-weight:800;}
+p{margin:0;}
+button{font-family:inherit;cursor:pointer;}
+input,select,textarea{font-family:inherit;}
+img{max-width:100%;display:block;}
+a{color:inherit;}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);}
+
+/* ---------- layout shell ---------- */
+#app{min-height:100vh;display:flex;flex-direction:column;}
+.appbar{position:sticky;top:0;z-index:40;background:var(--primary);color:#fff;display:none;align-items:center;justify-content:space-between;padding:14px 16px;gap:10px;}
+.appbar.show{display:flex;}
+.appbar .brand{display:flex;align-items:center;gap:8px;font-weight:800;font-size:17px;}
+.appbar .brand i{font-size:20px;}
+.appbar .actions{display:flex;align-items:center;gap:10px;}
+.icon-btn{background:rgba(255,255,255,0.18);border:none;color:#fff;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;position:relative;}
+.badge{position:absolute;top:-4px;right:-4px;background:var(--coral);color:#fff;font-size:10px;font-weight:800;min-width:17px;height:17px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 4px;}
+
+main{flex:1;width:100%;max-width:1100px;margin:0 auto;padding-bottom:90px;}
+.view{display:none;}
+.view.active{display:block;animation:fadein .18s ease;}
+@keyframes fadein{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+/* bottom nav */
+.bottomnav{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);display:none;justify-content:space-around;padding:8px 0 10px;z-index:40;}
+.bottomnav.show{display:flex;}
+.navitem{background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--muted);font-size:11px;font-weight:600;padding:4px 14px;border-radius:12px;}
+.navitem i{font-size:20px;}
+.navitem.active{color:var(--primary);}
+
+/* ---------- generic building blocks ---------- */
+.centerwrap{max-width:420px;margin:0 auto;padding:28px 20px 40px;}
+.authhero{text-align:center;margin-bottom:22px;}
+.authhero .logo{width:64px;height:64px;background:var(--tint);border-radius:20px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;color:#fff;font-size:30px;}
+.authhero h1{font-size:22px;}
+.authhero p{color:var(--muted);font-size:13px;margin-top:4px;}
+.field{margin-bottom:14px;}
+.field label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:6px;}
+.field input, .field select, .field textarea{width:100%;padding:12px 14px;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;}
+.field input:focus, .field select:focus, .field textarea:focus{border-color:var(--primary);}
+.hint{font-size:11px;color:var(--muted);margin-top:5px;}
+.btn{border:none;border-radius:var(--radius-sm);padding:13px 18px;font-weight:800;font-size:14px;display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;}
+.btn-primary{background:var(--primary);color:#fff;}
+.btn-primary:active{background:var(--primary-dark);}
+.btn-coral{background:var(--coral);color:#fff;}
+.btn-outline{background:var(--surface);color:var(--primary);border:1.5px solid var(--primary);}
+.btn-ghost{background:transparent;color:var(--muted);}
+.btn-danger{background:var(--danger);color:#fff;}
+.btn-sm{width:auto;padding:9px 14px;font-size:13px;border-radius:10px;}
+.linktext{color:var(--primary);font-weight:700;text-decoration:none;background:none;border:none;font-size:13px;}
+.center{text-align:center;}
+.row-between{display:flex;align-items:center;justify-content:space-between;}
+.stack-8{display:flex;flex-direction:column;gap:8px;}
+.stack-12{display:flex;flex-direction:column;gap:12px;}
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1.5px solid var(--border);color:var(--muted);font-size:12px;font-weight:700;padding:8px 14px;border-radius:20px;white-space:nowrap;}
+.chip.active{background:var(--primary);border-color:var(--primary);color:#fff;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);}
+.pageheader{display:flex;align-items:center;gap:10px;padding:16px;}
+.pageheader h2{font-size:17px;}
+.iconcircle{width:38px;height:38px;border-radius:50%;background:var(--tint);color:var(--primary);display:flex;align-items:center;justify-content:center;font-size:18px;border:none;flex-shrink:0;}
+.avatar{width:56px;height:56px;border-radius:16px;background:var(--tint);color:var(--primary);display:flex;align-items:center;justify-content:center;font-size:26px;overflow:hidden;flex-shrink:0;}
+.avatar img{width:100%;height:100%;object-fit:cover;}
+.photoupload{width:100%;height:140px;border-radius:var(--radius-md);border:2px dashed var(--border);background:var(--tint);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:var(--primary);font-weight:700;font-size:13px;overflow:hidden;position:relative;cursor:pointer;}
+.photoupload img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;}
+.photoupload input{position:absolute;inset:0;opacity:0;cursor:pointer;}
+.toast{position:fixed;bottom:96px;left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:11px 18px;border-radius:30px;font-size:13px;font-weight:700;z-index:200;opacity:0;pointer-events:none;transition:opacity .2s, transform .2s;box-shadow:var(--shadow-lift);}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(-6px);}
+
+/* modal / sheet */
+.overlay{position:fixed;inset:0;background:rgba(15,30,27,0.45);z-index:100;display:none;align-items:flex-end;justify-content:center;}
+.overlay.show{display:flex;}
+.sheet{background:var(--surface);width:100%;max-width:460px;border-radius:24px 24px 0 0;padding:20px;max-height:85vh;overflow-y:auto;animation:slideup .2s ease;}
+@keyframes slideup{from{transform:translateY(30px);opacity:0;}to{transform:none;opacity:1;}}
+.sheet-handle{width:40px;height:4px;background:var(--border);border-radius:3px;margin:0 auto 14px;}
+@media (min-width:640px){
+  .overlay{align-items:center;}
+  .sheet{border-radius:24px;}
+}
+
+/* ---------- merchant home ---------- */
+.greetbar{padding:18px 16px 6px;}
+.greetbar h2{font-size:20px;}
+.greetbar p{color:var(--muted);font-size:13px;margin-top:3px;}
+.premiumrow{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px 16px 0;}
+.premiumcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:14px;text-align:left;}
+.premiumcard i{font-size:20px;color:var(--primary);}
+.premiumcard .t{font-size:13px;font-weight:800;margin-top:8px;}
+.premiumcard .s{font-size:11px;color:var(--muted);margin-top:2px;}
+.upsell{margin:14px 16px 0;background:linear-gradient(135deg,var(--primary),var(--primary-darker));color:#fff;border-radius:var(--radius-md);padding:16px;display:flex;align-items:center;gap:12px;}
+.upsell i{font-size:26px;}
+.upsell .t{font-weight:800;font-size:14px;}
+.upsell .s{font-size:12px;opacity:.9;margin-top:2px;}
+.upsell button{margin-left:auto;flex-shrink:0;background:#fff;color:var(--primary);border:none;padding:9px 14px;border-radius:10px;font-weight:800;font-size:12px;}
+
+.sectiontitle{font-size:14px;font-weight:800;padding:18px 16px 10px;}
+.itemgrid{display:grid;grid-template-columns:1fr;gap:12px;padding:0 16px 10px;}
+@media (min-width:720px){.itemgrid{grid-template-columns:1fr 1fr;}}
+.itemcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);display:flex;gap:0;overflow:hidden;}
+.itemcard .thumb{width:78px;flex-shrink:0;background:var(--tint);display:flex;align-items:center;justify-content:center;font-size:28px;color:var(--primary);}
+.itemcard .thumb img{width:100%;height:100%;object-fit:cover;}
+.itemcard .body{flex:1;padding:10px 12px;min-width:0;}
+.itemcard .name{font-weight:800;font-size:14px;}
+.itemcard .prices{margin-top:4px;display:flex;align-items:baseline;gap:6px;}
+.itemcard .orig{font-size:12px;color:var(--muted);text-decoration:line-through;}
+.itemcard .disc{font-size:16px;font-weight:800;color:var(--coral-dark);}
+.itemcard .meta{margin-top:5px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.badgepill{font-size:10px;font-weight:800;padding:3px 8px;border-radius:8px;}
+.badgepill.urgent{background:var(--danger-tint);color:var(--danger-text);}
+.badgepill.soon{background:var(--amber-tint);color:var(--amber);}
+.badgepill.plenty{background:var(--green-ok-tint);color:var(--green-ok);}
+.itemcard .rowbtns{display:flex;gap:6px;margin-top:8px;}
+.iconlink{background:var(--tint);border:none;color:var(--primary-darker);border-radius:9px;padding:7px 10px;font-size:12px;font-weight:800;display:flex;align-items:center;gap:5px;}
+.iconlink.del{background:var(--danger-tint);color:var(--danger-text);}
+
+.fabwrap{position:sticky;bottom:80px;display:flex;justify-content:center;padding:0 16px;pointer-events:none;}
+.fab{pointer-events:auto;background:var(--coral);color:#fff;border:none;border-radius:30px;padding:14px 22px;font-weight:800;font-size:14px;display:flex;align-items:center;gap:8px;box-shadow:var(--shadow-lift);}
+
+.emptystate{padding:50px 20px;text-align:center;color:var(--muted);}
+.emptystate i{font-size:40px;color:var(--border);}
+.emptystate p{margin-top:10px;font-size:13px;}
+
+/* settings */
+.settingsgroup{margin:0 16px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden;}
+.settingsrow{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--border);}
+.settingsrow:last-child{border-bottom:none;}
+.settingsrow .lbl{flex:1;font-size:13px;font-weight:700;}
+.settingsrow .val{font-size:12px;color:var(--muted);}
+.switch{width:44px;height:26px;border-radius:14px;background:var(--border);position:relative;border:none;flex-shrink:0;}
+.switch.on{background:var(--primary);}
+.switch .dot{position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .15s;}
+.switch.on .dot{transform:translateX(18px);}
+
+/* table (surplus dashboard) */
+.tablewrap{margin:0 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th{text-align:left;background:var(--tint);color:var(--primary-darker);font-size:11px;text-transform:none;padding:10px 12px;font-weight:800;}
+td{padding:11px 12px;border-top:1px solid var(--border);}
+
+.insightcard{margin:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:16px;}
+.insightcard .head{display:flex;align-items:center;gap:10px;}
+.insightcard .head i{font-size:22px;color:var(--coral-dark);}
+.insightcard p{font-size:13px;margin-top:10px;line-height:1.5;color:var(--muted);}
+.recobanner{margin-top:12px;background:var(--tint);border-radius:12px;padding:12px 14px;font-size:13px;font-weight:800;color:var(--primary-darker);display:flex;gap:8px;align-items:flex-start;}
+
+/* customer home */
+.locrow{display:flex;align-items:center;gap:6px;padding:2px 16px 10px;font-size:12.5px;color:var(--text);}
+.locrow i{color:var(--coral-dark);font-size:15px;}
+.locrow button{background:none;border:none;color:var(--primary);font-weight:800;font-size:12px;margin-left:2px;}
+.searchbar{margin:0 16px 12px;background:var(--surface);border:1.5px solid var(--border);border-radius:16px;padding:11px 14px;display:flex;align-items:center;gap:8px;color:var(--muted);font-size:13px;}
+.catrow{display:flex;gap:9px;overflow-x:auto;overflow-y:visible;padding:14px 16px 6px;}
+.catchip{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:6px;border:none;background:none;padding:0;}
+.catchip .circ{width:52px;height:52px;border-radius:16px;background:var(--tint);border:none;display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--primary-darker);transition:transform .15s ease, box-shadow .15s ease, background .15s ease;}
+.catchip:hover .circ{transform:translateY(-3px);background:var(--secondary);color:#fff;}
+.catchip.active .circ{background:linear-gradient(135deg,var(--secondary),var(--primary));color:#fff;box-shadow:0 0 0 3px rgba(20,184,166,0.16), 0 4px 12px rgba(14,184,166,0.32);transform:translateY(-2px);}
+.catchip span{font-size:10.5px;font-weight:700;color:var(--muted);transition:color .15s ease;}
+.catchip:hover span{color:var(--primary-darker);}
+.catchip.active span{color:var(--primary-darker);font-weight:800;}
+.tagpill{background:var(--tint);color:var(--primary-darker);font-size:9.5px;font-weight:800;padding:2px 7px;border-radius:7px;}
+.tagpill.warn{background:var(--danger-tint);color:var(--danger-text);}
+.followbtn{position:absolute;top:16px;right:16px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.85);border:none;color:var(--coral-dark);display:flex;align-items:center;justify-content:center;font-size:18px;}
+.prefgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.prefchk{display:flex;align-items:center;gap:8px;background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:11px 12px;font-size:12.5px;font-weight:700;}
+.prefchk input{width:17px;height:17px;accent-color:var(--primary);}
+.tierbar{height:8px;background:var(--border);border-radius:5px;overflow:hidden;margin-top:8px;}
+.tierbar .fill{height:100%;background:var(--primary);}
+.streakdots{display:flex;gap:6px;margin-top:10px;}
+.streakdots .d{width:22px;height:22px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;color:transparent;}
+.streakdots .d.on{background:var(--coral);color:#fff;}
+
+.shopgrid{display:grid;grid-template-columns:1fr;gap:12px;padding:0 16px 10px;}
+@media (min-width:640px){.shopgrid{grid-template-columns:1fr 1fr;}}
+@media (min-width:980px){.shopgrid{grid-template-columns:1fr 1fr 1fr;}}
+.shopcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden;text-align:left;border:1px solid var(--border);}
+.shopcard .banner{height:84px;background:linear-gradient(135deg,var(--tint),var(--secondary));display:flex;align-items:center;justify-content:center;font-size:34px;color:var(--primary-darker);position:relative;overflow:hidden;}
+.shopcard .banner img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.shopcard .banner .tag{position:absolute;top:8px;left:8px;background:rgba(255,255,255,0.92);color:var(--coral-dark);font-size:10px;font-weight:800;padding:4px 8px;border-radius:8px;}
+.shopcard .info{padding:11px 13px;}
+.shopcard .name{font-weight:800;font-size:14px;}
+.shopcard .meta{font-size:11.5px;color:var(--muted);margin-top:3px;}
+
+/* shop detail */
+.shopheader{background:linear-gradient(135deg,var(--tint),var(--secondary));padding:20px 16px 16px;position:relative;}
+.backbtn{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.85);border:none;color:var(--primary-darker);display:flex;align-items:center;justify-content:center;font-size:18px;}
+.shopheader .shopicon{width:60px;height:60px;border-radius:18px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:28px;color:var(--primary);margin-top:14px;}
+.shopheader h2{margin-top:10px;font-size:19px;}
+.shopheader .meta{font-size:12px;color:var(--primary-darker);margin-top:3px;font-weight:700;}
+
+.buyrow{display:flex;align-items:center;gap:8px;margin-top:8px;}
+.qtystepper{display:flex;align-items:center;gap:0;border:1.5px solid var(--border);border-radius:10px;overflow:hidden;}
+.qtystepper button{width:28px;height:28px;background:var(--tint);border:none;color:var(--primary-darker);font-weight:800;}
+.qtystepper span{width:26px;text-align:center;font-weight:800;font-size:13px;}
+.addbtn{background:var(--primary);color:#fff;border:none;border-radius:10px;padding:8px 14px;font-size:12px;font-weight:800;}
+
+.cartbar{position:fixed;left:16px;right:16px;bottom:16px;background:var(--text);color:#fff;border-radius:16px;padding:13px 16px;display:none;align-items:center;justify-content:space-between;z-index:60;box-shadow:var(--shadow-lift);max-width:1068px;margin:0 auto;}
+.cartbar.show{display:flex;}
+.cartbar .l{font-size:13px;font-weight:700;}
+.cartbar .r{display:flex;align-items:center;gap:8px;font-weight:800;font-size:13px;}
+
+/* cart view */
+.cartrow{display:flex;gap:12px;padding:13px 16px;border-bottom:1px solid var(--border);align-items:center;}
+.cartrow .t{flex:1;min-width:0;}
+.cartrow .t .n{font-weight:800;font-size:13.5px;}
+.cartrow .t .s{font-size:11px;color:var(--muted);margin-top:2px;}
+.cartrow .price{font-weight:800;font-size:13.5px;color:var(--coral-dark);white-space:nowrap;}
+.trashbtn{background:none;border:none;color:var(--muted);font-size:16px;padding:4px;}
+.summarybox{margin:16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:16px;}
+.sumrow{display:flex;justify-content:space-between;font-size:13px;padding:5px 0;color:var(--muted);}
+.sumrow.total{border-top:1px solid var(--border);margin-top:6px;padding-top:10px;font-weight:800;color:var(--text);font-size:15px;}
+
+/* checkout */
+.segctrl{display:flex;gap:8px;padding:0 16px;margin-bottom:4px;}
+.segbtn{flex:1;padding:12px;border-radius:12px;border:1.5px solid var(--border);background:var(--surface);text-align:center;font-weight:800;font-size:13px;color:var(--muted);}
+.segbtn.active{background:var(--tint);border-color:var(--primary);color:var(--primary-darker);}
+.segbtn i{display:block;font-size:18px;margin-bottom:4px;}
+.optrow{display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid var(--border);}
+.optrow input[type=radio]{width:18px;height:18px;accent-color:var(--primary);}
+.optrow .oi{font-size:19px;color:var(--primary);}
+.optrow .ol{flex:1;font-size:13.5px;font-weight:700;}
+
+/* order tracking */
+.tracker{padding:20px 20px 6px;}
+.step{display:flex;gap:14px;position:relative;padding-bottom:26px;}
+.step .dot{width:26px;height:26px;border-radius:50%;background:var(--border);color:transparent;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;z-index:1;}
+.step.done .dot{background:var(--primary);color:#fff;}
+.step.current .dot{background:var(--coral);color:#fff;}
+.step:not(:last-child)::before{content:'';position:absolute;left:12.5px;top:26px;bottom:0;width:2px;background:var(--border);}
+.step.done:not(:last-child)::before{background:var(--primary);}
+.step .stext{padding-top:2px;}
+.step .stext .n{font-weight:800;font-size:13.5px;}
+.step .stext .d{font-size:11.5px;color:var(--muted);margin-top:2px;}
+
+.ridercard{margin:6px 16px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:14px;display:flex;align-items:center;gap:12px;}
+.ridercard .info{flex:1;}
+.ridercard .n{font-weight:800;font-size:13.5px;}
+.ridercard .s{font-size:11.5px;color:var(--muted);margin-top:2px;}
+
+/* chat */
+.chatheader{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--border);background:var(--surface);}
+.chatlog{padding:16px;display:flex;flex-direction:column;gap:10px;min-height:300px;}
+.bubble{max-width:75%;padding:10px 13px;border-radius:16px;font-size:13.5px;line-height:1.4;}
+.bubble.them{background:var(--tint);color:var(--text);align-self:flex-start;border-bottom-left-radius:4px;}
+.bubble.me{background:var(--primary);color:#fff;align-self:flex-end;border-bottom-right-radius:4px;}
+.chatinputbar{display:flex;gap:8px;padding:12px 16px;border-top:1px solid var(--border);background:var(--surface);position:sticky;bottom:0;}
+.chatinputbar input{flex:1;border-radius:20px;border:1.5px solid var(--border);padding:11px 15px;background:var(--bg);color:var(--text);outline:none;}
+.sendbtn{width:42px;height:42px;border-radius:50%;background:var(--primary);color:#fff;border:none;flex-shrink:0;font-size:16px;}
+
+/* splash */
+.splash{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px;background:linear-gradient(180deg,var(--tint),var(--bg) 60%);}
+.splash .logo{width:88px;height:88px;border-radius:26px;display:flex;align-items:center;justify-content:center;font-size:42px;color:#fff;margin-bottom:16px;box-shadow:var(--shadow-lift);}
+.splash h1{font-size:26px;}
+.splash p{color:var(--muted);font-size:13.5px;margin-top:8px;max-width:280px;}
+.roleBtns{margin-top:30px;display:flex;flex-direction:column;gap:12px;width:100%;max-width:320px;}
+.rolebtn{display:flex;align-items:center;gap:14px;padding:16px 18px;border-radius:18px;border:1.5px solid var(--border);background:var(--surface);text-align:left;}
+.rolebtn i{font-size:24px;color:var(--primary);}
+.rolebtn .t{font-weight:800;font-size:14.5px;}
+.rolebtn .s{font-size:11.5px;color:var(--muted);margin-top:2px;}
+
+/* subscribe */
+.plancard{margin:16px;background:linear-gradient(135deg,var(--primary),var(--primary-darker));color:#fff;border-radius:var(--radius-lg);padding:22px;}
+.plancard .price{font-size:30px;font-weight:900;margin-top:4px;}
+.plancard .price span{font-size:13px;font-weight:700;opacity:.85;}
+.planfeat{display:flex;gap:10px;align-items:flex-start;margin-top:12px;font-size:13px;}
+.planfeat i{margin-top:2px;}
+
+::-webkit-scrollbar{height:6px;width:6px;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:6px;}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ===================== APP BAR ===================== -->
+  <header class="appbar" id="appbar">
+    <div class="brand"><img style="width: 50px; height: 50px;" src="AppBarLogo.png" alt="REfood logo"> REfood</div>
+    <div class="actions">
+      <button class="icon-btn" id="cartBtn" style="display:none" onclick="go('cart')"><i class="ti ti-shopping-cart"></i><span class="badge" id="cartBadge" style="display:none">0</span></button>
+      <button class="icon-btn" onclick="openStaffChat()"><i class="ti ti-message-circle-2"></i></button>
+    </div>
+  </header>
+
+  <main id="main">
+
+    <!-- ===================== SPLASH ===================== -->
+    <section class="view active" id="view-splash">
+      <div class="splash">
+        <div class="logo"><img src="SplashLogo.png" alt="REfood logo"></div>
+        <h1>REfood</h1>
+        <p>No surprise. You choose what you save. Rescue near-expiry food from bakeries &amp; restaurants near you.</p>
+        <div class="roleBtns">
+          <button class="rolebtn" onclick="go('c-login')">
+            <i class="ti ti-user-heart"></i>
+            <div><div class="t">Continue as Customer</div><div class="s">Browse &amp; rescue nearby deals</div></div>
+          </button>
+          <button class="rolebtn" onclick="go('m-login')">
+            <i class="ti ti-building-store"></i>
+            <div><div class="t">Continue as Merchant</div><div class="s">List surplus &amp; manage your shop</div></div>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== MERCHANT: LOGIN ===================== -->
+    <section class="view" id="view-m-login">
+      <div class="centerwrap">
+        <button class="linktext" onclick="go('splash')"><i class="ti ti-chevron-left"></i> Back</button>
+        <div class="authhero"><div class="logo"><img src="SplashLogo.png" alt="REfood logo"></div><h1>Merchant log in</h1><p>Manage your shop's surplus listings</p></div>
+        <div class="field"><label>Email</label><input type="email" placeholder="shop@email.com" value="sp.bakery@refood.demo"></div>
+        <div class="field"><label>Password</label><input type="password" placeholder="••••••••" value="password"></div>
+        <button class="btn btn-primary" onclick="loginMerchant()">Log in</button>
+        <p class="center" style="margin-top:16px;font-size:13px;color:var(--muted)">New merchant? <button class="linktext" onclick="go('m-signup')">Create an account</button></p>
+      </div>
+    </section>
+
+    <!-- ===================== MERCHANT: SIGNUP ===================== -->
+    <section class="view" id="view-m-signup">
+      <div class="centerwrap">
+        <button class="linktext" onclick="go('m-login')"><i class="ti ti-chevron-left"></i> Back</button>
+        <div class="authhero"><h1>Create merchant account</h1><p>Tell customers about your shop</p></div>
+        <div class="field">
+          <label>Shop or food photo</label>
+          <label class="photoupload" id="signupPhotoWrap">
+            <i class="ti ti-camera" style="font-size:24px" id="signupPhotoIcon"></i>
+            <span id="signupPhotoLabel">Tap to upload a photo</span>
+            <input type="file" accept="image/*" onchange="previewPhoto(this,'signupPhotoWrap','signupPhotoIcon','signupPhotoLabel')">
+          </label>
+        </div>
+        <div class="field"><label>Shop name</label><input id="su-shopname" placeholder="e.g. S&amp;P Bakery"></div>
+        <div class="field"><label>Owner name</label><input id="su-owner" placeholder="e.g. Somsri J."></div>
+        <div class="field"><label>Email</label><input id="su-email" type="email" placeholder="shop@email.com"></div>
+        <div class="field"><label>Phone number</label><input id="su-phone" placeholder="08x-xxx-xxxx"></div>
+        <div class="field"><label>Shop address</label><input id="su-address" placeholder="e.g. 12 Sukhumvit Rd, Bangkok"></div>
+        <div class="field"><label>Password</label><input type="password" placeholder="Create a password"></div>
+        <button class="btn btn-primary" onclick="signupMerchant()">Create account</button>
+      </div>
+    </section>
+
+    <!-- ===================== MERCHANT: HOME ===================== -->
+    <section class="view" id="view-m-home">
+      <div class="greetbar row-between">
+        <div>
+          <h2 id="m-greeting">Hi there 👋</h2>
+          <p>Here's what's ready to rescue today</p>
+        </div>
+        <div class="avatar" id="m-avatar"><i class="ti ti-building-store"></i></div>
+      </div>
+
+      <div id="m-premium-row"></div>
+
+      <div class="row-between" style="padding:0 16px;">
+        <div class="sectiontitle" style="padding-left:0">Your listings</div>
+      </div>
+      <div class="itemgrid" id="m-item-list"></div>
+
+      <div class="fabwrap">
+        <button class="fab" onclick="openItemForm(null)"><i class="ti ti-plus"></i> Upload new item</button>
+      </div>
+    </section>
+
+    <!-- ===================== MERCHANT: ITEM FORM (add/edit) ===================== -->
+    <section class="view" id="view-m-item-form">
+      <div class="pageheader">
+        <button class="backbtn" onclick="go('m-home')" style="background:var(--tint);color:var(--primary-darker)"><i class="ti ti-chevron-left"></i></button>
+        <h2 id="if-title">Upload new item</h2>
+      </div>
+      <div class="centerwrap" style="padding-top:4px;">
+        <div class="field">
+          <label>Item photo</label>
+          <label class="photoupload" id="itemPhotoWrap">
+            <i class="ti ti-camera" style="font-size:24px" id="itemPhotoIcon"></i>
+            <span id="itemPhotoLabel">Tap to upload a photo</span>
+            <input type="file" accept="image/*" onchange="previewPhoto(this,'itemPhotoWrap','itemPhotoIcon','itemPhotoLabel')">
+          </label>
+        </div>
+        <div class="field"><label>Item name</label><input id="if-name" placeholder="e.g. Croissant bundle (2 pcs)"></div>
+        <div class="field"><label>Original price (฿)</label><input id="if-orig" type="number" inputmode="decimal" placeholder="120" oninput="recalcPrice()"></div>
+        <div class="field"><label>Discount percentage (%)</label><input id="if-disc" type="number" min="0" max="90" placeholder="50" oninput="recalcPrice()"></div>
+        <div class="field">
+          <label>Price after discount</label>
+          <input id="if-final" type="text" readonly value="฿0" style="font-weight:800;color:var(--coral-dark);background:var(--tint);border-color:var(--tint);">
+        </div>
+        <div class="field">
+          <label>Time left before expiry</label>
+          <select id="if-expiry">
+            <option value="1h">1 hour left</option>
+            <option value="4h" selected>4 hours left</option>
+            <option value="1d">1 day left</option>
+            <option value="2d">2 days left</option>
+            <option value="7d">7 days left</option>
+          </select>
+        </div>
+        <div class="field"><label>Quantity available</label><input id="if-qty" type="number" min="1" value="5"></div>
+        <button class="btn btn-primary" onclick="saveItem()" id="if-savebtn">Add item</button>
+      </div>
+    </section>
+
+    <!-- ===================== MERCHANT: SETTINGS ===================== -->
+    <section class="view" id="view-m-settings">
+      <div class="pageheader"><h2>Settings</h2></div>
+
+      <div class="settingsgroup">
+        <div class="settingsrow">
+          <div class="avatar" id="m-set-avatar"><i class="ti ti-building-store"></i></div>
+          <div style="flex:1">
+            <div class="lbl" id="m-set-name">S&amp;P Bakery</div>
+            <div class="val" id="m-set-email">sp.bakery@refood.demo</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="settingsgroup">
+        <div class="settingsrow">
+          <i class="ti ti-map-pin iconcircle"></i>
+          <div style="flex:1">
+            <div class="lbl">Shop address</div>
+            <div class="val" id="m-set-address">12 Sukhumvit Rd, Bangkok</div>
+          </div>
+          <button class="btn btn-sm btn-outline" onclick="openAddressEditor('merchant')">Change</button>
+        </div>
+      </div>
+
+      <div class="settingsgroup">
+        <div class="settingsrow">
+          <i class="ti ti-moon iconcircle"></i>
+          <div class="lbl">Dark mode</div>
+          <button class="switch" id="darkSwitch" onclick="toggleDark()"><span class="dot"></span></button>
+        </div>
+      </div>
+
+      <div class="settingsgroup">
+        <div class="settingsrow" id="m-sub-row">
+          <i class="ti ti-crown iconcircle"></i>
+          <div style="flex:1">
+            <div class="lbl">Subscription</div>
+            <div class="val" id="m-sub-status">Free plan</div>
+          </div>
+          <button class="btn btn-sm btn-primary" onclick="go('m-subscribe')" id="m-sub-btn">Upgrade</button>
+        </div>
+        <div class="settingsrow" id="m-cancel-sub-row" style="display:none;cursor:pointer;" onclick="openOverlay('cancelSubOverlay')">
+          <i class="ti ti-x iconcircle" style="background:var(--danger-tint);color:var(--danger-text)"></i>
+          <div class="lbl" style="color:var(--danger-text)">Cancel subscription</div>
+        </div>
+      </div>
+
+      <div class="settingsgroup">
+        <div class="settingsrow" style="cursor:pointer" onclick="logout('merchant')">
+          <i class="ti ti-logout iconcircle" style="background:var(--danger-tint);color:var(--danger-text)"></i>
+          <div class="lbl" style="color:var(--danger-text)">Log out</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== MERCHANT: SUBSCRIBE ===================== -->
+    <section class="view" id="view-m-subscribe">
+      <div class="pageheader">
+        <button class="backbtn" onclick="go('m-settings')" style="background:var(--tint);color:var(--primary-darker)"><i class="ti ti-chevron-left"></i></button>
+        <h2>REfood Premium</h2>
+      </div>
+      <div class="plancard">
+        <div style="font-weight:800;font-size:13px;opacity:.9;">MONTHLY PLAN</div>
+        <div class="price">฿299 <span>/ month</span></div>
+        <div class="planfeat"><i class="ti ti-chart-bar"></i> Today's Surplus Dashboard — see quantity, discount &amp; time remaining at a glance</div>
+        <div class="planfeat"><i class="ti ti-bulb"></i> Waste Prediction — forecasts of tomorrow's surplus, based on your sales history</div>
+        <div class="planfeat"><i class="ti ti-headset"></i> Priority merchant support</div>
+      </div>
+      <div class="centerwrap" style="padding-top:0;">
+        <button class="btn btn-coral" onclick="subscribeMerchant()">Subscribe now</button>
+        <button class="btn btn-ghost" onclick="go('m-settings')">Not now</button>
+      </div>
+    </section>
+
+    <!-- ===================== MERCHANT: SURPLUS DASHBOARD (premium) ===================== -->
+    <section class="view" id="view-m-surplus">
+      <div class="pageheader">
+        <button class="backbtn" onclick="go('m-home')" style="background:var(--tint);color:var(--primary-darker)"><i class="ti ti-chevron-left"></i></button>
+        <h2>Today's surplus</h2>
+      </div>
+      <p style="padding:0 16px;color:var(--muted);font-size:12.5px;margin-bottom:12px;">A live snapshot of what's still unsold today.</p>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>Product</th><th>Qty</th><th>Discount</th><th>Remaining</th></tr></thead>
+          <tbody id="m-surplus-table"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===================== MERCHANT: WASTE PREDICTION (premium) ===================== -->
+    <section class="view" id="view-m-waste">
+      <div class="pageheader">
+        <button class="backbtn" onclick="go('m-home')" style="background:var(--tint);color:var(--primary-darker)"><i class="ti ti-chevron-left"></i></button>
+        <h2>Waste prediction</h2>
+      </div>
+      <div class="insightcard">
+        <div class="head"><i class="ti ti-bulb"></i><h3 style="font-size:14px;">Pattern detected</h3></div>
+        <p>Looking at your last 6 Fridays, approximately 15 croissants have gone unsold each week — a fairly consistent pattern.</p>
+      </div>
+      <div class="insightcard">
+        <div class="head"><i class="ti ti-chart-line"></i><h3 style="font-size:14px;">Forecast for this Friday</h3></div>
+        <p>Based on that pattern, expected surplus is <strong style="color:var(--text)">14–17 croissants</strong>.</p>
+        <div class="recobanner"><i class="ti ti-sparkles"></i> Prepare about 10% fewer croissants tomorrow to reduce waste.</div>
+      </div>
+
+      <div class="sectiontitle" style="padding-top:6px;">This week — croissants</div>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>Day</th><th>Predicted surplus</th><th>Actual surplus</th></tr></thead>
+          <tbody>
+            <tr><td>Mon</td><td>6–9</td><td>7</td></tr>
+            <tr><td>Tue</td><td>5–8</td><td>6</td></tr>
+            <tr><td>Wed</td><td>7–10</td><td>9</td></tr>
+            <tr><td>Thu</td><td>6–9</td><td>8</td></tr>
+            <tr><td><strong>Fri</strong></td><td><strong>14–17</strong></td><td style="color:var(--muted)">—</td></tr>
+            <tr><td>Sat</td><td>10–13</td><td style="color:var(--muted)">—</td></tr>
+            <tr><td>Sun</td><td>8–11</td><td style="color:var(--muted)">—</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="padding:0 16px 20px;color:var(--muted);font-size:11.5px;">This is an example forecast for the demo — in the full product this updates automatically from real sales history.</p>
+    </section>
+
+    <!-- ===================== CUSTOMER: LOGIN ===================== -->
+    <section class="view" id="view-c-login">
+      <div class="centerwrap">
+        <button class="linktext" onclick="go('splash')"><i class="ti ti-chevron-left"></i> Back</button>
+        <div class="authhero"><div class="logo"><img src="SplashLogo.png" alt="REfood logo"></div><h1>Welcome back</h1><p>Log in to find today's rescue deals</p></div>
+        <div class="field"><label>Email</label><input type="email" placeholder="you@email.com" value="nina@refood.demo"></div>
+        <div class="field"><label>Password</label><input type="password" placeholder="••••••••" value="password"></div>
+        <button class="btn btn-primary" onclick="loginCustomer()">Log in</button>
+        <p class="center" style="margin-top:16px;font-size:13px;color:var(--muted)">New here? <button class="linktext" onclick="go('c-signup')">Create an account</button></p>
+      </div>
+    </section>
+
+    <!-- ===================== CUSTOMER: SIGNUP ===================== -->
+    <section class="view" id="view-c-signup">
+      <div class="centerwrap">
+        <button class="linktext" onclick="go('c-login')"><i class="ti ti-chevron-left"></i> Back</button>
+        <div class="authhero"><h1>Create your account</h1><p>Start rescuing food nearby</p></div>
+        <div class="field">
+          <label>Profile photo (optional)</label>
+          <label class="photoupload" id="csuPhotoWrap">
+            <i class="ti ti-camera" style="font-size:24px" id="csuPhotoIcon"></i>
+            <span id="csuPhotoLabel">Tap to upload a photo</span>
+            <input type="file" accept="image/*" onchange="previewPhoto(this,'csuPhotoWrap','csuPhotoIcon','csuPhotoLabel')">
+          </label>
+        </div>
+        <div class="field"><label>Full name</label><input id="csu-name" placeholder="e.g. Nina T."></div>
+        <div class="field"><label>Email</label><input id="csu-email" type="email" placeholder="you@email.com"></div>
+        <div class="field"><label>Phone number</label><input id="csu-phone" placeholder="08x-xxx-xxxx"></div>
+        <div class="field"><label>Home address</label><input id="csu-address" placeholder="e.g. 25 Sukhumvit Soi 11, Bangkok"></div>
+        <div class="field"><label>Password</label><input type="password" placeholder="Create a password"></div>
+        <button class="btn btn-primary" onclick="signupCustomer()">Create account</button>
+      </div>
+    </section>
+
+    <!-- ===================== CUSTOMER: HOME ===================== -->
+    <section class="view" id="view-c-home">
+      <div class="greetbar">
+        <h2 id="c-greeting">Hi, Nina 👋</h2>
+        <p>Fresh rescues are waiting nearby</p>
+      </div>
+      <div class="locrow"><i class="ti ti-map-pin"></i> <span id="c-location">Sukhumvit, Bangkok</span> <button onclick="openLocationEditor()">Change</button></div>
+      <div class="searchbar"><i class="ti ti-search"></i> Search bakeries, dishes...</div>
+      <div class="catrow" id="c-categories"></div>
+      <div class="sectiontitle">Shops near you</div>
+      <div class="shopgrid" id="c-shop-list"></div>
+    </section>
+
+    <!-- ===================== SHOP DETAIL ===================== -->
+    <section class="view" id="view-shop-detail">
+      <div class="shopheader" id="sd-header">
+        <button class="backbtn" onclick="go('c-home')"><i class="ti ti-chevron-left"></i></button>
+        <button class="followbtn" id="sd-follow-btn" onclick="toggleFollow(state.currentShopId)"><i class="ti ti-heart"></i></button>
+        <div class="shopicon" id="sd-icon" style="overflow:hidden;"><i class="ti ti-bread"></i></div>
+        <h2 id="sd-name">Shop name</h2>
+        <div class="meta" id="sd-meta">0.8 km away · 4.6 ★</div>
+      </div>
+      <div class="sectiontitle">Today's rescues</div>
+      <div class="stack-12" id="sd-items" style="padding:0 16px 100px;"></div>
+    </section>
+
+    <!-- ===================== CART ===================== -->
+    <section class="view" id="view-cart">
+      <div class="pageheader">
+        <button class="backbtn" onclick="go('c-home')" style="background:var(--tint);color:var(--primary-darker)"><i class="ti ti-chevron-left"></i></button>
+        <h2>Your cart</h2>
+      </div>
+      <div id="cart-body"></div>
+    </section>
+
+    <!-- ===================== CHECKOUT ===================== -->
+    <section class="view" id="view-checkout">
+      <div class="pageheader">
+        <button class="backbtn" onclick="go('cart')" style="background:var(--tint);color:var(--primary-darker)"><i class="ti ti-chevron-left"></i></button>
+        <h2>Checkout</h2>
+      </div>
+
+      <div class="sectiontitle" style="padding-top:0;">Fulfillment</div>
+      <div class="segctrl">
+        <button class="segbtn active" id="seg-pickup" onclick="setFulfillment('pickup')"><i class="ti ti-shopping-bag"></i>Pickup</button>
+        <button class="segbtn" id="seg-delivery" onclick="setFulfillment('delivery')"><i class="ti ti-motorbike"></i>Delivery</button>
+      </div>
+
+      <div class="sectiontitle">Address</div>
+      <div class="card" style="margin:0 16px;padding:13px 14px;display:flex;gap:10px;align-items:center;">
+        <i class="ti ti-map-pin" style="color:var(--coral-dark);font-size:18px;"></i>
+        <div style="font-size:13px;font-weight:700;" id="co-address">Sukhumvit, Bangkok</div>
+      </div>
+
+      <div class="sectiontitle">Payment method</div>
+      <div class="card" style="margin:0 16px;overflow:hidden;">
+        <label class="optrow"><input type="radio" name="pay" checked><i class="ti ti-qrcode oi"></i><span class="ol">PromptPay / QR</span></label>
+        <label class="optrow"><input type="radio" name="pay"><i class="ti ti-credit-card oi"></i><span class="ol">Credit / Debit card</span></label>
+        <label class="optrow"><input type="radio" name="pay"><i class="ti ti-cash oi"></i><span class="ol">Cash on {{pickupOrDelivery}}</span></label>
+      </div>
+
+      <div class="sectiontitle">Order summary</div>
+      <div class="summarybox" id="co-summary"></div>
+
+      <div class="centerwrap" style="padding-top:0;">
+        <button class="btn btn-coral" onclick="placeOrder()">Place order</button>
+      </div>
+    </section>
+
+    <!-- ===================== ORDER TRACKING: PICKUP ===================== -->
+    <section class="view" id="view-order-pickup">
+      <div class="pageheader"><h2>Order status</h2></div>
+      <p style="padding:0 16px;color:var(--muted);font-size:12.5px;">Pickup from <strong id="pk-shop" style="color:var(--text)">S&amp;P Bakery</strong></p>
+      <div class="tracker" id="pk-tracker"></div>
+      <div class="centerwrap" style="padding-top:4px;">
+        <button class="btn btn-primary" id="pk-action" onclick="advancePickup()">I've picked up my order</button>
+        <button class="linktext center" style="display:block;margin:14px auto 0;" onclick="go('c-home')">Back to home</button>
+      </div>
+      <div class="summarybox" id="pk-summary"></div>
+    </section>
+
+    <!-- ===================== ORDER TRACKING: DELIVERY ===================== -->
+    <section class="view" id="view-order-delivery">
+      <div class="pageheader"><h2>Order status</h2></div>
+      <p style="padding:0 16px;color:var(--muted);font-size:12.5px;">Delivery from <strong id="dl-shop" style="color:var(--text)">S&amp;P Bakery</strong></p>
+      <div class="tracker" id="dl-tracker"></div>
+      <div class="ridercard" id="dl-ridercard" style="display:none;">
+        <div class="avatar"><i class="ti ti-motorbike"></i></div>
+        <div class="info"><div class="n">Somchai P.</div><div class="s">Your rider · Honda Wave · ✦ 4.9</div></div>
+        <button class="icon-btn" style="background:var(--tint);color:var(--primary-darker)" onclick="go('rider-chat')"><i class="ti ti-message-circle-2"></i></button>
+      </div>
+      <div class="centerwrap" style="padding-top:0;">
+        <button class="btn btn-outline" id="dl-action" onclick="advanceDelivery()">Simulate next status (demo)</button>
+        <button class="linktext center" style="display:block;margin:14px auto 0;" onclick="go('c-home')">Back to home</button>
+      </div>
+      <div class="summarybox" id="dl-summary"></div>
+    </section>
+
+    <!-- ===================== RIDER CHAT ===================== -->
+    <section class="view" id="view-rider-chat">
+      <div class="chatheader">
+        <button class="backbtn" onclick="go('order-delivery')" style="background:var(--tint);color:var(--primary-darker)"><i class="ti ti-chevron-left"></i></button>
+        <div class="avatar" style="width:40px;height:40px;font-size:18px;"><i class="ti ti-motorbike"></i></div>
+        <div><div style="font-weight:800;font-size:14px;">Somchai P.</div><div style="font-size:11px;color:var(--muted);">Your rider · usually replies fast</div></div>
+      </div>
+      <div class="chatlog" id="rider-chatlog"></div>
+      <div class="chatinputbar">
+        <input id="rider-chat-input" placeholder="Message your rider..." onkeydown="if(event.key==='Enter')sendRiderMsg()">
+        <button class="sendbtn" onclick="sendRiderMsg()"><i class="ti ti-send"></i></button>
+      </div>
+    </section>
+
+    <!-- ===================== CUSTOMER: FOOD PREFERENCES ===================== -->
+    <section class="view" id="view-c-preferences">
+      <div class="pageheader">
+        <button class="backbtn" id="pref-back-btn" onclick="go('c-settings')" style="background:var(--tint);color:var(--primary-darker)"><i class="ti ti-chevron-left"></i></button>
+        <h2>Food preferences</h2>
+      </div>
+      <p style="padding:0 16px;color:var(--muted);font-size:12.5px;margin-bottom:6px;">This personalizes your "Recommended for you" feed.</p>
+
+      <div class="sectiontitle">What do you like?</div>
+      <div class="prefgrid" style="padding:0 16px;" id="pref-likes"></div>
+
+      <div class="sectiontitle">What do you avoid?</div>
+      <div class="prefgrid" style="padding:0 16px;" id="pref-avoids"></div>
+
+      <div class="centerwrap" style="padding-top:18px;">
+        <button class="btn btn-primary" onclick="savePreferences()">Save preferences</button>
+      </div>
+    </section>
+
+    <!-- ===================== CUSTOMER: SETTINGS / PROFILE ===================== -->
+    <section class="view" id="view-c-settings">
+      <div class="pageheader"><h2>Profile &amp; settings</h2></div>
+
+      <div class="settingsgroup">
+        <div class="settingsrow">
+          <div class="avatar" id="c-set-avatar"><i class="ti ti-user"></i></div>
+          <div style="flex:1">
+            <div class="lbl" id="c-set-name">Nina T.</div>
+            <div class="val" id="c-set-email">nina@refood.demo</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="settingsgroup">
+        <div class="settingsrow" style="cursor:pointer" onclick="go('c-rescue')">
+          <i class="ti ti-trophy iconcircle"></i>
+          <div style="flex:1">
+            <div class="lbl">Rescue Score &amp; rewards</div>
+            <div class="val" id="c-set-rescue-summary">0 points · 0 items rescued</div>
+          </div>
+          <i class="ti ti-chevron-right" style="color:var(--muted)"></i>
+        </div>
+        <div class="settingsrow" style="cursor:pointer" onclick="go('c-preferences')">
+          <i class="ti ti-adjustments iconcircle"></i>
+          <div class="lbl" style="flex:1">Food preferences</div>
+          <i class="ti ti-chevron-right" style="color:var(--muted)"></i>
+        </div>
+        <div class="settingsrow" style="cursor:pointer" onclick="go('c-follow')">
+          <i class="ti ti-heart iconcircle"></i>
+          <div class="lbl" style="flex:1">Followed shops</div>
+          <i class="ti ti-chevron-right" style="color:var(--muted)"></i>
+        </div>
+      </div>
+
+      <div class="settingsgroup">
+        <div class="settingsrow">
+          <i class="ti ti-map-pin iconcircle"></i>
+          <div style="flex:1">
+            <div class="lbl">Delivery address</div>
+            <div class="val" id="c-set-address">Sukhumvit, Bangkok</div>
+          </div>
+          <button class="btn btn-sm btn-outline" onclick="openAddressEditor('customer')">Change</button>
+        </div>
+        <div class="settingsrow" style="cursor:pointer" onclick="toast('Payment methods are managed at checkout in this demo')">
+          <i class="ti ti-credit-card iconcircle"></i>
+          <div class="lbl" style="flex:1">Payment methods</div>
+          <i class="ti ti-chevron-right" style="color:var(--muted)"></i>
+        </div>
+      </div>
+
+      <div class="settingsgroup">
+        <div class="settingsrow">
+          <i class="ti ti-moon iconcircle"></i>
+          <div class="lbl">Dark mode</div>
+          <button class="switch" id="darkSwitchCustomer" onclick="toggleDark()"><span class="dot"></span></button>
+        </div>
+      </div>
+
+      <div class="settingsgroup">
+        <div class="settingsrow" style="cursor:pointer" onclick="logout('customer')">
+          <i class="ti ti-logout iconcircle" style="background:var(--danger-tint);color:var(--danger-text)"></i>
+          <div class="lbl" style="color:var(--danger-text)">Log out</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== CUSTOMER: ORDERS ===================== -->
+    <section class="view" id="view-c-orders">
+      <div class="pageheader"><h2>Your orders</h2></div>
+      <div class="stack-12" id="c-orders-list" style="padding:0 16px 20px;"></div>
+    </section>
+
+    <!-- ===================== CUSTOMER: RESCUE SCORE ===================== -->
+    <section class="view" id="view-c-rescue">
+      <div class="pageheader">
+        <button class="backbtn" onclick="go('c-settings')" style="background:var(--tint);color:var(--primary-darker)"><i class="ti ti-chevron-left"></i></button>
+        <h2>Rescue Score</h2>
+      </div>
+      <div class="plancard" style="background:linear-gradient(135deg,var(--primary),var(--primary-darker));">
+        <div style="font-weight:800;font-size:13px;opacity:.9;" id="rs-tier">BRONZE RESCUER</div>
+        <div class="price" id="rs-points">0 <span>points</span></div>
+        <div style="font-size:12.5px;margin-top:10px;opacity:.95;" id="rs-summary">You rescued 0 items · saved ฿0</div>
+        <div class="tierbar"><div class="fill" id="rs-tierfill" style="width:0%"></div></div>
+        <div style="font-size:11px;margin-top:6px;opacity:.85;" id="rs-tiernext">10 rescues to Silver Rescuer</div>
+      </div>
+
+      <div class="insightcard">
+        <div class="head"><i class="ti ti-flame" style="color:var(--coral-dark);"></i><h3 style="font-size:14px;">7-day Rescue Streak</h3></div>
+        <p>Complete 7 rescues in a row to earn a ฿50 voucher.</p>
+        <div class="streakdots" id="rs-streak"></div>
+      </div>
+
+      <div class="insightcard">
+        <div class="head"><i class="ti ti-award"></i><h3 style="font-size:14px;">Tiers &amp; rewards</h3></div>
+        <p>Bronze Rescuer — 10 rescues · Silver Rescuer — 30 rescues · Gold Rescuer — 60 rescues.<br>Rewards: ฿20 voucher, free delivery, partner discounts.</p>
+      </div>
+    </section>
+
+    <!-- ===================== CUSTOMER: FOLLOWED SHOPS ===================== -->
+    <section class="view" id="view-c-follow">
+      <div class="pageheader">
+        <button class="backbtn" onclick="go('c-settings')" style="background:var(--tint);color:var(--primary-darker)"><i class="ti ti-chevron-left"></i></button>
+        <h2>Followed shops</h2>
+      </div>
+      <div class="stack-12" id="c-follow-list" style="padding:0 16px 20px;"></div>
+    </section>
+
+  </main>
+
+  <!-- ===================== BOTTOM NAV ===================== -->
+  <nav class="bottomnav" id="bottomnav"></nav>
+
+  <!-- ===================== STAFF CHAT OVERLAY ===================== -->
+  <div class="overlay" id="staffChatOverlay">
+    <div class="sheet" style="padding:0;display:flex;flex-direction:column;height:80vh;">
+      <div class="chatheader">
+        <div class="avatar" style="width:40px;height:40px;font-size:18px;background:var(--primary);color:#fff;"><i class="ti ti-headset"></i></div>
+        <div style="flex:1"><div style="font-weight:800;font-size:14px;">REfood Support</div><div style="font-size:11px;color:var(--muted);">Usually replies within minutes</div></div>
+        <button class="icon-btn" style="background:var(--tint);color:var(--primary-darker)" onclick="closeStaffChat()"><i class="ti ti-x"></i></button>
+      </div>
+      <div class="chatlog" id="staff-chatlog" style="flex:1;overflow-y:auto;"></div>
+      <div class="chatinputbar">
+        <input id="staff-chat-input" placeholder="Message REfood support..." onkeydown="if(event.key==='Enter')sendStaffMsg()">
+        <button class="sendbtn" onclick="sendStaffMsg()"><i class="ti ti-send"></i></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== ADDRESS EDITOR SHEET ===================== -->
+  <div class="overlay" id="addressOverlay">
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <h3 style="font-size:16px;margin-bottom:14px;">Change address</h3>
+      <div class="field"><input id="addr-input" placeholder="Type an address..."></div>
+      <div class="stack-8" id="addr-suggestions"></div>
+      <button class="btn btn-primary" style="margin-top:14px;" onclick="saveAddress()">Save address</button>
+    </div>
+  </div>
+
+  <!-- ===================== DELETE CONFIRM SHEET ===================== -->
+  <div class="overlay" id="deleteOverlay">
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <div class="center" style="padding:6px 0 16px;">
+        <i class="ti ti-alert-triangle" style="font-size:34px;color:var(--danger);"></i>
+        <h3 style="font-size:16px;margin-top:10px;">Delete this item?</h3>
+        <p style="font-size:13px;color:var(--muted);margin-top:6px;" id="delete-itemname">This can't be undone.</p>
+      </div>
+      <div class="stack-8">
+        <button class="btn btn-danger" onclick="confirmDelete()">Delete item</button>
+        <button class="btn btn-ghost" onclick="closeOverlay('deleteOverlay')">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== CANCEL SUBSCRIPTION CONFIRM ===================== -->
+  <div class="overlay" id="cancelSubOverlay">
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <div class="center" style="padding:6px 0 16px;">
+        <i class="ti ti-alert-triangle" style="font-size:34px;color:var(--danger);"></i>
+        <h3 style="font-size:16px;margin-top:10px;">Cancel Premium?</h3>
+        <p style="font-size:13px;color:var(--muted);margin-top:6px;">You'll lose access to the Surplus Dashboard and Waste Prediction at the end of this billing period.</p>
+      </div>
+      <div class="stack-8">
+        <button class="btn btn-danger" onclick="cancelSubscription()">Cancel subscription</button>
+        <button class="btn btn-ghost" onclick="closeOverlay('cancelSubOverlay')">Keep Premium</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== ORDER DETAIL (read-only) ===================== -->
+  <div class="overlay" id="orderDetailOverlay">
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <h3 style="font-size:16px;margin-bottom:10px;" id="od-title">Order</h3>
+      <div id="od-body"></div>
+      <button class="btn btn-ghost" style="margin-top:6px;" onclick="closeOverlay('orderDetailOverlay')">Close</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+/* ============================================================
+   REfood demo — static/mock data only, no backend.
+   ============================================================ */
+
+const CATEGORIES = [
+  {id:'bakery', label:'Bakery', icon:'ti-bread'},
+  {id:'desserts', label:'Desserts', icon:'ti-cookie'},
+  {id:'drinks', label:'Drinks', icon:'ti-cup'},
+  {id:'thai', label:'Thai food', icon:'ti-soup'},
+  {id:'japanese', label:'Japanese', icon:'ti-fish'},
+  {id:'vegetarian', label:'Vegetarian', icon:'ti-salad'},
+  {id:'healthy', label:'Healthy food', icon:'ti-apple'},
+];
+
+function mkItem(id,name,orig,discPct,expiry,qty,icon,tags,photo){
+  return {id, name, orig, discPct, price: Math.round(orig*(1-discPct/100)), expiry, qty, icon, tags: tags||[], photo: photo||null};
+}
+// hand-drawn illustrations as data-URIs: 100% reliable, no network/hotlink needed
+function svgPhoto(svg){ return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg); }
+const ILLUS_CROISSANT = svgPhoto(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#DFF5EF"/><path d="M15 62 Q8 30 40 18 Q68 8 88 28 Q70 22 55 30 Q38 39 36 55 Q34 71 50 82 Q26 88 15 62 Z" fill="#E3A94B"/><path d="M24 44 Q34 39 44 41" stroke="#B8791F" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M27 55 Q37 50 49 52" stroke="#B8791F" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M31 66 Q41 61 54 63" stroke="#B8791F" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>`);
+const ILLUS_SANDWICH = svgPhoto(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#DFF5EF"/><clipPath id="sw"><path d="M50 14 L89 83 L11 83 Z"/></clipPath><g clip-path="url(#sw)"><rect x="0" y="14" width="100" height="15" fill="#F1D9A8"/><rect x="0" y="29" width="100" height="8" fill="#7BAE4A"/><rect x="0" y="37" width="100" height="10" fill="#E06B4E"/><rect x="0" y="47" width="100" height="8" fill="#F0C555"/><rect x="0" y="55" width="100" height="13" fill="#D98B5F"/><rect x="0" y="68" width="100" height="15" fill="#F1D9A8"/></g><path d="M50 14 L89 83 L11 83 Z" fill="none" stroke="#B8874A" stroke-width="3" stroke-linejoin="round"/></svg>`);
+
+const SHOPS = [
+  // NOTE: photo fields use a keyword-based placeholder photo service so every
+  // card/screen has something realistic to show. Swap these URLs for your own
+  // shop/food photos before presenting — keyword placeholders occasionally
+  // mismatch (as you saw with the sandwich).
+  {id:1, name:"S&P Bakery", category:'bakery', icon:'ti-bread', distance:'0.8 km', rating:4.6,
+    photo:'https://loremflickr.com/700/400/bakery,pastry?lock=9001',
+    items:[
+      mkItem(101,'Croissant bundle (2 pcs)',120,50,'4h','5','ti-bread',['Vegetarian','Contains dairy'],'https://loremflickr.com/300/300/croissant,bakery?lock=103'),
+      mkItem(102,'Sandwich box',150,40,'2h','3','ti-sandwich',['Contains dairy'],'https://loremflickr.com/300/300/sandwich,bakery?lock=103'),
+      mkItem(103,'Mixed pastry bag',180,55,'1d','8','ti-bread',['Vegetarian','Contains nuts'],'https://loremflickr.com/300/300/pastries,bakery?lock=103'),
+    ]},
+  {id:2, name:"Green Bowl", category:'vegetarian', icon:'ti-salad', distance:'1.2 km', rating:4.8,
+    photo:'https://loremflickr.com/700/400/saladbar,restaurant?lock=9004',
+    items:[
+      mkItem(201,'Veggie buddha bowl',180,50,'2d','6','ti-salad',['Vegetarian','Healthy'],'https://loremflickr.com/300/300/buddhabowl,salad?lock=201'),
+      mkItem(202,'Tofu stir-fry box',140,45,'1d','4','ti-tools-kitchen-2',['Vegetarian'],'https://loremflickr.com/300/300/tofu,stirfry?lock=202'),
+    ]},
+  {id:3, name:"Sweet Co.", category:'desserts', icon:'ti-cookie', distance:'2.1 km', rating:4.5,
+    photo:'https://loremflickr.com/700/400/dessert,bakery?lock=9006',
+    items:[
+      mkItem(301,'Cookie box (6 pcs)',100,50,'7d','12','ti-cookie',['Contains nuts','Contains dairy'],'https://loremflickr.com/300/300/cookies,box?lock=301'),
+      mkItem(302,'Chocolate cake slice',90,40,'2d','5','ti-cake',['Contains dairy'],'https://loremflickr.com/300/300/chocolatecake,slice?lock=302'),
+    ]},
+  {id:4, name:"Sakura Sushi", category:'japanese', icon:'ti-fish', distance:'1.5 km', rating:4.7,
+    photo:'https://loremflickr.com/700/400/sushi,restaurant?lock=90076',
+    items:[
+      mkItem(401,'Sushi surprise set',220,50,'4h','3','ti-fish',['Contains seafood'],'https://loremflickr.com/300/300/sushiset,japanese?lock=401'),
+      mkItem(402,'Onigiri bundle (3 pcs)',99,45,'1d','7','ti-fish',['Halal','Contains seafood'],'https://loremflickr.com/300/300/onigiri,japanese?lock=402'),
+    ]},
+  {id:5, name:"Thai Table", category:'thai', icon:'ti-soup', distance:'0.6 km', rating:4.4,
+    photo:'https://loremflickr.com/700/400/thaifood,restaurant?lock=9005',
+    items:[
+      mkItem(501,'Pad thai box',89,35,'2h','4','ti-soup',['Contains seafood','Contains nuts'],'https://loremflickr.com/300/300/padthai,noodles?lock=501'),
+      mkItem(502,'Green curry set',129,40,'1d','6','ti-soup',['Halal'],'https://loremflickr.com/300/300/greencurry,thaifood?lock=502'),
+    ]},
+  {id:6, name:"Daily Brew", category:'drinks', icon:'ti-cup', distance:'0.9 km', rating:4.3,
+    photo:'https://loremflickr.com/700/400/coffeeshop,cafe?lock=9006',
+    items:[
+      mkItem(601,'Cold brew 3-pack',150,50,'2d','5','ti-cup',['Vegetarian'],'https://loremflickr.com/300/300/coldbrew,coffee?lock=601'),
+      mkItem(602,'Fresh juice bundle',120,45,'1d','6','ti-cup',['Vegetarian','Healthy'],'https://loremflickr.com/300/300/freshjuice,drink?lock=602'),
+    ]},
+];
+
+const PREF_LIKES = ['Bakery','Vegetarian','Thai food','Japanese','Desserts','Healthy food'];
+const PREF_AVOIDS = ['Seafood','Pork','Nuts','Dairy'];
+
+const state = {
+  role: null,               // 'merchant' | 'customer'
+  dark: false,
+  merchant: {
+    shopName:'S&P Bakery', owner:'Somsri J.', email:'sp.bakery@refood.demo',
+    address:'12 Sukhumvit Rd, Bangkok', photo:null, premium:false,
+    items: JSON.parse(JSON.stringify(SHOPS[0].items)),
+  },
+  customer: {
+    name:'Nina T.', email:'nina@refood.demo', photo:null,
+    location:'Sukhumvit, Bangkok', activeCategory:null,
+    prefs: {likes:[], avoids:[]},
+    followedShopIds: [],
+    rescue: {points:0, itemsRescued:0, moneySaved:0, streak:0},
+    orderHistory: [], // {id, type, shop, items, total, status}
+    _justSignedUp: false,
+  },
+  cart: [],           // {shopId, shopName, itemId, name, price, orig, qty}
+  currentShopId: null,
+  editingItemId: null,
+  pendingDeleteId: null,
+  fulfillment: 'pickup',
+  addressEditFor: null, // 'customer' | 'merchant'
+  pickup: {id:null, stepIndex:0, shop:null, items:[], total:0},
+  delivery: {id:null, stepIndex:0, shop:null, items:[], total:0},
+};
+
+/* ---------- navigation ---------- */
+function go(view){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+view).classList.add('active');
+  window.scrollTo(0,0);
+  updateChrome(view);
+  if(view==='m-home') renderMerchantHome();
+  if(view==='c-home') renderCustomerHome();
+  if(view==='cart') renderCart();
+  if(view==='checkout') renderCheckout();
+  if(view==='m-surplus') renderSurplusTable();
+  if(view==='rider-chat') renderRiderChat();
+  if(view==='c-settings') renderCustomerSettings();
+  if(view==='c-preferences') renderPreferencesScreen();
+  if(view==='c-orders') renderOrdersList();
+  if(view==='c-rescue') renderRescueScreen();
+  if(view==='c-follow') renderFollowList();
+}
+
+function updateChrome(view){
+  const appbar = document.getElementById('appbar');
+  const bottomnav = document.getElementById('bottomnav');
+  const cartBtn = document.getElementById('cartBtn');
+  const chromeViews = {
+    'm-home':'merchant','m-settings':'merchant',
+    'c-home':'customer','shop-detail':'customer','cart':'customer',
+    'c-orders':'customer','c-settings':'customer',
+  };
+  const role = chromeViews[view];
+  if(role){
+    appbar.classList.add('show');
+    cartBtn.style.display = role==='customer' ? 'flex' : 'none';
+    renderBottomNav(role, view);
+    bottomnav.classList.add('show');
+  } else {
+    appbar.classList.remove('show');
+    bottomnav.classList.remove('show');
+  }
+}
+
+function renderBottomNav(role, view){
+  const nav = document.getElementById('bottomnav');
+  let items = [];
+  if(role==='merchant'){
+    items = [
+      {id:'m-home', label:'Home', icon:'ti-home'},
+      {id:'m-settings', label:'Settings', icon:'ti-settings'},
+    ];
+  } else {
+    items = [
+      {id:'c-home', label:'Home', icon:'ti-home'},
+      {id:'c-orders', label:'Orders', icon:'ti-list-check'},
+      {id:'c-settings', label:'Profile', icon:'ti-user'},
+    ];
+  }
+  const profileSub = ['c-settings','c-preferences','c-rescue','c-follow'];
+  nav.innerHTML = items.map(it=>{
+    const isActive = it.id===view || (it.id==='c-settings' && profileSub.includes(view));
+    return `<button class="navitem ${isActive?'active':''}" onclick="go('${it.id}')"><i class="ti ${it.icon}"></i>${it.label}</button>`;
+  }).join('');
+}
+
+/* ---------- toast ---------- */
+let toastTimer;
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('show'), 1800);
+}
+
+/* ---------- overlay helpers ---------- */
+function openOverlay(id){ document.getElementById(id).classList.add('show'); }
+function closeOverlay(id){ document.getElementById(id).classList.remove('show'); }
+
+/* ---------- photo upload preview (client-side only) ---------- */
+function previewPhoto(input, wrapId, iconId, labelId){
+  const file = input.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e=>{
+    const wrap = document.getElementById(wrapId);
+    let img = wrap.querySelector('img');
+    if(!img){ img = document.createElement('img'); wrap.prepend(img); }
+    img.src = e.target.result;
+    document.getElementById(iconId).style.display='none';
+    document.getElementById(labelId).style.display='none';
+  };
+  reader.readAsDataURL(file);
+}
+
+/* ============================================================
+   AUTH
+   ============================================================ */
+function loginMerchant(){ state.role='merchant'; go('m-home'); toast('Welcome back!'); }
+function signupMerchant(){
+  const name = document.getElementById('su-shopname').value.trim();
+  if(name) state.merchant.shopName = name;
+  const owner = document.getElementById('su-owner').value.trim(); if(owner) state.merchant.owner=owner;
+  const email = document.getElementById('su-email').value.trim(); if(email) state.merchant.email=email;
+  const addr = document.getElementById('su-address').value.trim(); if(addr) state.merchant.address=addr;
+  const photoImg = document.getElementById('signupPhotoWrap').querySelector('img');
+  if(photoImg) state.merchant.photo = photoImg.src;
+  state.role='merchant';
+  go('m-home');
+  toast('Account created — welcome to REfood!');
+}
+function loginCustomer(){ state.role='customer'; go('c-home'); toast('Welcome back!'); }
+function signupCustomer(){
+  const name = document.getElementById('csu-name').value.trim(); if(name) state.customer.name=name;
+  const addr = document.getElementById('csu-address').value.trim(); if(addr) state.customer.location=addr;
+  const photoImg = document.getElementById('csuPhotoWrap').querySelector('img');
+  if(photoImg) state.customer.photo = photoImg.src;
+  state.role='customer';
+  state.customer._justSignedUp = true;
+  go('c-preferences');
+  toast('Account created — tell us what you like!');
+}
+function logout(role){
+  state.role=null;
+  go('splash');
+  toast('Logged out');
+}
+
+/* ============================================================
+   MERCHANT HOME + ITEM CRUD
+   ============================================================ */
+function expiryLabel(code){
+  return {'1h':'1h left','4h':'4h left','1d':'1 day left','2d':'2 days left','7d':'7 days left'}[code] || code;
+}
+function expiryClass(code){
+  if(code==='1h'||code==='4h') return 'urgent';
+  if(code==='1d'||code==='2d') return 'soon';
+  return 'plenty';
+}
+
+function renderMerchantHome(){
+  document.getElementById('m-greeting').textContent = `Hi, ${state.merchant.shopName} 👋`;
+  const av = document.getElementById('m-avatar');
+  av.innerHTML = state.merchant.photo ? `<img src="${state.merchant.photo}">` : '<i class="ti ti-building-store"></i>';
+
+  const list = document.getElementById('m-item-list');
+  if(state.merchant.items.length===0){
+    list.innerHTML = `<div class="emptystate" style="grid-column:1/-1;"><i class="ti ti-basket-off"></i><p>No items listed yet. Upload your first rescue item.</p></div>`;
+  } else {
+    list.innerHTML = state.merchant.items.map(it=>`
+      <div class="itemcard">
+        <div class="thumb">${it.photo?`<img src="${it.photo}">`:`<i class="ti ${it.icon||'ti-tools-kitchen-2'}"></i>`}</div>
+        <div class="body">
+          <div class="name">${it.name}</div>
+          <div class="prices"><span class="orig">฿${it.orig}</span><span class="disc">฿${it.price}</span></div>
+          <div class="meta">
+            <span class="badgepill ${expiryClass(it.expiry)}">${expiryLabel(it.expiry)}</span>
+            <span class="badgepill plenty" style="background:var(--tint);color:var(--primary-darker)">${it.discPct}% off</span>
+            <span class="badgepill plenty" style="background:var(--tint);color:var(--primary-darker)">Qty ${it.qty}</span>
+          </div>
+          <div class="rowbtns">
+            <button class="iconlink" onclick="openItemForm(${it.id})"><i class="ti ti-pencil"></i>Edit</button>
+            <button class="iconlink del" onclick="askDelete(${it.id})"><i class="ti ti-trash"></i>Delete</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  const prow = document.getElementById('m-premium-row');
+  if(state.merchant.premium){
+    prow.innerHTML = `
+      <div class="premiumrow">
+        <button class="premiumcard" onclick="go('m-surplus')"><i class="ti ti-chart-bar"></i><div class="t">Surplus dashboard</div><div class="s">Today's stock at a glance</div></button>
+        <button class="premiumcard" onclick="go('m-waste')"><i class="ti ti-bulb"></i><div class="t">Waste prediction</div><div class="s">Forecast tomorrow's surplus</div></button>
+      </div>`;
+  } else {
+    prow.innerHTML = `
+      <div class="upsell">
+        <i class="ti ti-crown"></i>
+        <div><div class="t">Unlock Premium</div><div class="s">Surplus dashboard + waste prediction</div></div>
+        <button onclick="go('m-subscribe')">Upgrade</button>
+      </div>`;
+  }
+}
+
+function openItemForm(id){
+  state.editingItemId = id;
+  document.getElementById('if-title').textContent = id ? 'Edit item' : 'Upload new item';
+  document.getElementById('if-savebtn').textContent = id ? 'Save changes' : 'Add item';
+  const wrap = document.getElementById('itemPhotoWrap');
+  wrap.querySelector('img')?.remove();
+  document.getElementById('itemPhotoIcon').style.display='';
+  document.getElementById('itemPhotoLabel').style.display='';
+  document.getElementById('itemPhotoLabel').textContent='Tap to upload a photo';
+
+  if(id){
+    const it = state.merchant.items.find(i=>i.id===id);
+    document.getElementById('if-name').value = it.name;
+    document.getElementById('if-orig').value = it.orig;
+    document.getElementById('if-disc').value = it.discPct;
+    document.getElementById('if-expiry').value = it.expiry;
+    document.getElementById('if-qty').value = it.qty;
+    if(it.photo){
+      const img=document.createElement('img'); img.src=it.photo; wrap.prepend(img);
+      document.getElementById('itemPhotoIcon').style.display='none';
+      document.getElementById('itemPhotoLabel').style.display='none';
+    }
+  } else {
+    document.getElementById('if-name').value='';
+    document.getElementById('if-orig').value='';
+    document.getElementById('if-disc').value='';
+    document.getElementById('if-expiry').value='4h';
+    document.getElementById('if-qty').value=5;
+  }
+  recalcPrice();
+  go('m-item-form');
+}
+
+function recalcPrice(){
+  const orig = parseFloat(document.getElementById('if-orig').value)||0;
+  const disc = parseFloat(document.getElementById('if-disc').value)||0;
+  const final = Math.round(orig*(1-disc/100));
+  document.getElementById('if-final').value = '฿'+ (final>0?final:0);
+}
+
+function saveItem(){
+  const name = document.getElementById('if-name').value.trim();
+  const orig = parseFloat(document.getElementById('if-orig').value)||0;
+  const disc = parseFloat(document.getElementById('if-disc').value)||0;
+  const expiry = document.getElementById('if-expiry').value;
+  const qty = parseInt(document.getElementById('if-qty').value)||1;
+  if(!name || !orig){ toast('Please fill in item name and price'); return; }
+  const price = Math.round(orig*(1-disc/100));
+  const photoImg = document.getElementById('itemPhotoWrap').querySelector('img');
+  const photo = photoImg ? photoImg.src : null;
+
+  if(state.editingItemId){
+    const it = state.merchant.items.find(i=>i.id===state.editingItemId);
+    Object.assign(it, {name, orig, discPct:disc, price, expiry, qty, photo: photo||it.photo});
+    toast('Item updated');
+  } else {
+    state.merchant.items.push({id:Date.now(), name, orig, discPct:disc, price, expiry, qty, photo, icon:'ti-tools-kitchen-2'});
+    toast('Item added');
+  }
+  go('m-home');
+}
+
+function askDelete(id){
+  state.pendingDeleteId = id;
+  const it = state.merchant.items.find(i=>i.id===id);
+  document.getElementById('delete-itemname').textContent = `"${it.name}" will be removed from your listings. This can't be undone.`;
+  openOverlay('deleteOverlay');
+}
+function confirmDelete(){
+  state.merchant.items = state.merchant.items.filter(i=>i.id!==state.pendingDeleteId);
+  closeOverlay('deleteOverlay');
+  renderMerchantHome();
+  toast('Item deleted');
+}
+
+/* ---------- merchant settings ---------- */
+function toggleDark(){
+  state.dark = !state.dark;
+  document.documentElement.setAttribute('data-theme', state.dark?'dark':'light');
+  document.getElementById('darkSwitch')?.classList.toggle('on', state.dark);
+  document.getElementById('darkSwitchCustomer')?.classList.toggle('on', state.dark);
+}
+function subscribeMerchant(){
+  state.merchant.premium = true;
+  toast('Subscribed! Premium unlocked 🎉');
+  go('m-home');
+}
+function renderSurplusTable(){
+  document.getElementById('m-surplus-table').innerHTML = state.merchant.items.map(it=>`
+    <tr><td>${it.name}</td><td>${it.qty}</td><td>${it.discPct}%</td><td>${expiryLabel(it.expiry)}</td></tr>
+  `).join('') || '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:20px;">No items listed yet</td></tr>';
+}
+
+/* sync settings display whenever we open settings */
+function fillMerchantSettings(){
+  document.getElementById('m-set-name').textContent = state.merchant.shopName;
+  document.getElementById('m-set-email').textContent = state.merchant.email;
+  document.getElementById('m-set-address').textContent = state.merchant.address;
+  document.getElementById('m-set-avatar').innerHTML = state.merchant.photo?`<img src="${state.merchant.photo}">`:'<i class="ti ti-building-store"></i>';
+  document.getElementById('m-sub-status').textContent = state.merchant.premium ? 'Premium — ฿299/month' : 'Free plan';
+  document.getElementById('m-sub-btn').textContent = state.merchant.premium ? 'Manage' : 'Upgrade';
+  document.getElementById('m-sub-btn').setAttribute('onclick', state.merchant.premium ? "openOverlay('cancelSubOverlay')" : "go('m-subscribe')");
+  document.getElementById('m-cancel-sub-row').style.display = state.merchant.premium ? 'flex' : 'none';
+}
+const _origGo = go;
+go = function(view){ _origGo(view); if(view==='m-settings') fillMerchantSettings(); };
+
+/* ============================================================
+   CUSTOMER HOME
+   ============================================================ */
+function renderCustomerHome(){
+  document.getElementById('c-greeting').textContent = `Hi, ${state.customer.name.split(' ')[0]} 👋`;
+  document.getElementById('c-location').textContent = state.customer.location;
+
+  const allChip = `
+    <button class="catchip ${state.customer.activeCategory===null?'active':''}" onclick="filterCategory(null)">
+      <div class="circ"><i class="ti ti-apps"></i></div><span>All</span>
+    </button>`;
+  document.getElementById('c-categories').innerHTML = allChip + CATEGORIES.map(c=>`
+    <button class="catchip ${state.customer.activeCategory===c.id?'active':''}" onclick="filterCategory('${c.id}')">
+      <div class="circ"><i class="ti ${c.icon}"></i></div><span>${c.label}</span>
+    </button>
+  `).join('');
+
+  renderShopList();
+  updateCartBadge();
+}
+function filterCategory(id){
+  state.customer.activeCategory = id;
+  renderCustomerHome();
+}
+function renderShopList(){
+  const shops = state.customer.activeCategory ? SHOPS.filter(s=>s.category===state.customer.activeCategory) : SHOPS;
+  const list = document.getElementById('c-shop-list');
+  if(shops.length===0){
+    list.innerHTML = `<div class="emptystate" style="grid-column:1/-1;"><i class="ti ti-mood-empty"></i><p>No shops in this category right now.</p></div>`;
+    return;
+  }
+  list.innerHTML = shops.map(s=>{
+    const minLeft = s.items.reduce((a,b)=> (b.expiry==='1h'||b.expiry==='4h') ? 'urgent' : a, '');
+    return `
+    <button class="shopcard" onclick="openShop(${s.id})">
+      <div class="banner">${s.photo?`<img src="${s.photo}" alt="${s.name}">`:`<i class="ti ${s.icon}"></i>`}<span class="tag">${s.items.length} deals left</span></div>
+      <div class="info">
+        <div class="name">${s.name}</div>
+        <div class="meta">${s.distance} · ✦ ${s.rating}</div>
+      </div>
+    </button>`;
+  }).join('');
+}
+
+function openLocationEditor(){
+  state.addressEditFor='customer';
+  document.getElementById('addr-input').value = state.customer.location;
+  document.getElementById('addr-suggestions').innerHTML = [
+    'Sukhumvit, Bangkok','Sathorn, Bangkok','Thonglor, Bangkok','Ari, Bangkok','Silom, Bangkok'
+  ].map(a=>`<button class="chip" style="width:100%;justify-content:flex-start;" onclick="pickSuggestion('${a}')"><i class="ti ti-map-pin"></i> ${a}</button>`).join('');
+  openOverlay('addressOverlay');
+}
+function openAddressEditor(who){
+  state.addressEditFor = who;
+  document.getElementById('addr-input').value = who==='merchant' ? state.merchant.address : state.customer.location;
+  document.getElementById('addr-suggestions').innerHTML='';
+  openOverlay('addressOverlay');
+}
+function pickSuggestion(a){ document.getElementById('addr-input').value = a; }
+function saveAddress(){
+  const val = document.getElementById('addr-input').value.trim();
+  if(!val){ toast('Please enter an address'); return; }
+  if(state.addressEditFor==='customer'){ state.customer.location = val; renderCustomerHome(); }
+  else { state.merchant.address = val; fillMerchantSettings(); }
+  closeOverlay('addressOverlay');
+  toast('Address updated');
+}
+
+/* ============================================================
+   SHOP DETAIL + CART
+   ============================================================ */
+function openShop(id){
+  state.currentShopId = id;
+  const shop = SHOPS.find(s=>s.id===id);
+  const headerEl = document.getElementById('sd-header');
+  if(shop.photo){
+    headerEl.style.backgroundImage = `linear-gradient(rgba(10,30,26,0.25),rgba(10,30,26,0.15)), url('${shop.photo}')`;
+    headerEl.style.backgroundSize = 'cover';
+    headerEl.style.backgroundPosition = 'center';
+  } else {
+    headerEl.style.backgroundImage = '';
+  }
+  document.getElementById('sd-icon').innerHTML = shop.photo ? `<img src="${shop.photo}" style="width:100%;height:100%;object-fit:cover;">` : `<i class="ti ${shop.icon}"></i>`;
+  document.getElementById('sd-name').textContent = shop.name;
+  document.getElementById('sd-meta').textContent = `${shop.distance} away · ✦ ${shop.rating}`;
+  const isFollowed = state.customer.followedShopIds.includes(id);
+  const followBtn = document.getElementById('sd-follow-btn');
+  followBtn.innerHTML = `<i class="ti ${isFollowed?'ti-heart-filled':'ti-heart'}"></i>`;
+  followBtn.style.color = isFollowed ? 'var(--coral-dark)' : 'var(--coral-dark)';
+  const avoids = state.customer.prefs.avoids.map(a=>a.toLowerCase());
+  document.getElementById('sd-items').innerHTML = shop.items.map(it=>{
+    const tagHtml = (it.tags||[]).map(t=>{
+      const warn = avoids.some(a=>t.toLowerCase().includes(a));
+      return `<span class="tagpill ${warn?'warn':''}">${t}</span>`;
+    }).join(' ');
+    return `
+    <div class="itemcard" style="flex-direction:column;">
+      <div style="display:flex;">
+        <div class="thumb">${it.photo?`<img src="${it.photo}" alt="${it.name}">`:`<i class="ti ${it.icon}"></i>`}</div>
+        <div class="body">
+          <div class="name">${it.name}</div>
+          <div class="prices"><span class="orig">฿${it.orig}</span><span class="disc">฿${it.price}</span></div>
+          <div class="meta" style="margin-top:4px;">
+            <span class="badgepill ${expiryClass(it.expiry)}">${expiryLabel(it.expiry)}</span>
+            ${tagHtml}
+          </div>
+          <div class="buyrow">
+            <div class="qtystepper">
+              <button onclick="stepQty(${shop.id},${it.id},-1)">−</button>
+              <span id="qty-${shop.id}-${it.id}">0</span>
+              <button onclick="stepQty(${shop.id},${it.id},1)">+</button>
+            </div>
+            <button class="addbtn" onclick="addToCart(${shop.id},${it.id})"><i class="ti ti-shopping-cart-plus"></i> Add</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  }).join('');
+  go('shop-detail');
+  updateCartBar();
+}
+
+const pendingQty = {};
+function stepQty(shopId,itemId,delta){
+  const key = shopId+'-'+itemId;
+  pendingQty[key] = Math.max(0,(pendingQty[key]||0)+delta);
+  document.getElementById(`qty-${key}`).textContent = pendingQty[key];
+}
+function addToCart(shopId,itemId){
+  const key = shopId+'-'+itemId;
+  const qty = pendingQty[key]||1;
+  const shop = SHOPS.find(s=>s.id===shopId);
+  const item = shop.items.find(i=>i.id===itemId);
+  const existing = state.cart.find(c=>c.shopId===shopId && c.itemId===itemId);
+  if(existing){ existing.qty += qty; }
+  else { state.cart.push({shopId, shopName:shop.name, itemId, name:item.name, price:item.price, orig:item.orig, icon:item.icon, qty}); }
+  pendingQty[key]=0;
+  document.getElementById(`qty-${key}`).textContent = 0;
+  updateCartBadge();
+  updateCartBar();
+  toast(`Added to cart`);
+}
+function updateCartBadge(){
+  const count = state.cart.reduce((a,c)=>a+c.qty,0);
+  const badge = document.getElementById('cartBadge');
+  if(count>0){ badge.style.display='flex'; badge.textContent=count; }
+  else { badge.style.display='none'; }
+}
+function cartTotal(){ return state.cart.reduce((a,c)=>a+c.price*c.qty,0); }
+function updateCartBar(){
+  let bar = document.getElementById('shopCartBar');
+  const count = state.cart.reduce((a,c)=>a+c.qty,0);
+  if(!bar){
+    bar = document.createElement('div');
+    bar.className='cartbar';
+    bar.id='shopCartBar';
+    bar.innerHTML = `<div class="l"><span id="scb-count">0</span> items</div><div class="r" onclick="go('cart')">View cart · ฿<span id="scb-total">0</span> <i class="ti ti-chevron-right"></i></div>`;
+    document.getElementById('app').appendChild(bar);
+  }
+  document.getElementById('scb-count').textContent = count;
+  document.getElementById('scb-total').textContent = cartTotal();
+  bar.classList.toggle('show', count>0 && document.getElementById('view-shop-detail').classList.contains('active'));
+}
+
+function renderCart(){
+  updateCartBar();
+  document.getElementById('shopCartBar')?.classList.remove('show');
+  const body = document.getElementById('cart-body');
+  if(state.cart.length===0){
+    body.innerHTML = `<div class="emptystate"><i class="ti ti-shopping-cart-off"></i><p>Your cart is empty.</p><button class="btn btn-primary" style="margin-top:16px;max-width:220px;" onclick="go('c-home')">Browse shops</button></div>`;
+    return;
+  }
+  const rows = state.cart.map((c,idx)=>`
+    <div class="cartrow">
+      <div class="iconcircle"><i class="ti ${c.icon||'ti-tools-kitchen-2'}"></i></div>
+      <div class="t"><div class="n">${c.name}</div><div class="s">${c.shopName} · x${c.qty}</div></div>
+      <div class="price">฿${c.price*c.qty}</div>
+      <button class="trashbtn" onclick="removeCartItem(${idx})"><i class="ti ti-trash"></i></button>
+    </div>
+  `).join('');
+  body.innerHTML = rows + `
+    <div class="summarybox">
+      <div class="sumrow"><span>Subtotal</span><span>฿${cartTotal()}</span></div>
+      <div class="sumrow total"><span>Total</span><span>฿${cartTotal()}</span></div>
+    </div>
+    <div class="centerwrap" style="padding-top:0;"><button class="btn btn-coral" onclick="go('checkout')">Checkout</button></div>
+  `;
+}
+function removeCartItem(idx){
+  state.cart.splice(idx,1);
+  renderCart();
+  updateCartBadge();
+  toast('Removed from cart');
+}
+
+/* ============================================================
+   CHECKOUT
+   ============================================================ */
+function setFulfillment(mode){
+  state.fulfillment = mode;
+  document.getElementById('seg-pickup').classList.toggle('active', mode==='pickup');
+  document.getElementById('seg-delivery').classList.toggle('active', mode==='delivery');
+  renderCheckout();
+}
+function renderCheckout(){
+  const isDelivery = state.fulfillment==='delivery';
+  document.getElementById('co-address').textContent = isDelivery ? state.customer.location : (state.cart[0]?.shopName || '') + ' (pickup at store)';
+  const deliveryFee = isDelivery ? 40 : 0;
+  const subtotal = cartTotal();
+  document.getElementById('co-summary').innerHTML = `
+    ${state.cart.map(c=>`<div class="sumrow"><span>${c.name} x${c.qty}</span><span>฿${c.price*c.qty}</span></div>`).join('')}
+    <div class="sumrow"><span>Delivery fee</span><span>${deliveryFee?('฿'+deliveryFee):'Free'}</span></div>
+    <div class="sumrow total"><span>Total</span><span>฿${subtotal+deliveryFee}</span></div>
+  `;
+}
+function placeOrder(){
+  if(state.cart.length===0){ toast('Your cart is empty'); return; }
+  const isDelivery = state.fulfillment==='delivery';
+  const subtotal = cartTotal();
+  const fee = isDelivery?40:0;
+  const shopName = state.cart[0].shopName;
+  const orderId = Date.now();
+  const payload = {id:orderId, type:isDelivery?'delivery':'pickup', stepIndex:0, shop:shopName, items:[...state.cart], total:subtotal+fee};
+  state.customer.orderHistory.unshift({id:orderId, type:payload.type, shop:shopName, items:[...state.cart], total:subtotal+fee, status:'active'});
+  state.cart = [];
+  updateCartBadge();
+  if(isDelivery){
+    state.delivery = payload;
+    renderDeliveryTracker();
+    go('order-delivery');
+  } else {
+    state.pickup = payload;
+    renderPickupTracker();
+    go('order-pickup');
+  }
+  toast('Order placed!');
+}
+
+function completeOrder(payload){
+  const totalQty = payload.items.reduce((a,c)=>a+c.qty,0);
+  const saved = payload.items.reduce((a,c)=>a+((c.orig||c.price)-c.price)*c.qty,0);
+  state.customer.rescue.points += totalQty*10;
+  state.customer.rescue.itemsRescued += totalQty;
+  state.customer.rescue.moneySaved += saved;
+  state.customer.rescue.streak += 1;
+  let streakReward = false;
+  if(state.customer.rescue.streak >= 7){ state.customer.rescue.streak = 0; streakReward = true; }
+  const hist = state.customer.orderHistory.find(o=>o.id===payload.id);
+  if(hist) hist.status = 'completed';
+  if(streakReward) toast('🔥 7-day Rescue Streak complete — ฿50 voucher earned!');
+}
+
+/* ============================================================
+   ORDER TRACKING
+   ============================================================ */
+const PICKUP_STEPS = ['Order received','Preparing your food','Ready for pickup'];
+const DELIVERY_STEPS = ['Order received','Preparing your food','Picked up by rider','On the way'];
+
+function stepsHtml(steps, idx){
+  return steps.map((s,i)=>`
+    <div class="step ${i<idx?'done':''} ${i===idx?'current':''}">
+      <div class="dot">${i<idx?'<i class="ti ti-check"></i>':(i+1)}</div>
+      <div class="stext"><div class="n">${s}</div><div class="d">${i<idx?'Completed':(i===idx?'In progress':'Waiting')}</div></div>
+    </div>
+  `).join('');
+}
+function renderPickupTracker(){
+  document.getElementById('pk-shop').textContent = state.pickup.shop;
+  document.getElementById('pk-tracker').innerHTML = stepsHtml(PICKUP_STEPS, state.pickup.stepIndex);
+  const done = state.pickup.stepIndex >= PICKUP_STEPS.length-1;
+  const btn = document.getElementById('pk-action');
+  btn.textContent = done ? "I've picked up my order" : 'Simulate next status (demo)';
+  document.getElementById('pk-summary').innerHTML = `
+    ${state.pickup.items.map(c=>`<div class="sumrow"><span>${c.name} x${c.qty}</span><span>฿${c.price*c.qty}</span></div>`).join('')}
+    <div class="sumrow total"><span>Total</span><span>฿${state.pickup.total}</span></div>`;
+}
+function advancePickup(){
+  if(state.pickup.stepIndex < PICKUP_STEPS.length-1){
+    state.pickup.stepIndex++;
+    renderPickupTracker();
+  } else {
+    completeOrder(state.pickup);
+    toast('Thanks for rescuing food with REfood! 🌱');
+    go('c-home');
+  }
+}
+function renderDeliveryTracker(){
+  document.getElementById('dl-shop').textContent = state.delivery.shop;
+  document.getElementById('dl-tracker').innerHTML = stepsHtml(DELIVERY_STEPS, state.delivery.stepIndex);
+  document.getElementById('dl-ridercard').style.display = state.delivery.stepIndex>=2 ? 'flex' : 'none';
+  const done = state.delivery.stepIndex >= DELIVERY_STEPS.length-1;
+  document.getElementById('dl-action').textContent = done ? "Mark as delivered" : 'Simulate next status (demo)';
+  document.getElementById('dl-action').className = done ? 'btn btn-primary' : 'btn btn-outline';
+  document.getElementById('dl-action').disabled = false;
+  document.getElementById('dl-summary').innerHTML = `
+    ${state.delivery.items.map(c=>`<div class="sumrow"><span>${c.name} x${c.qty}</span><span>฿${c.price*c.qty}</span></div>`).join('')}
+    <div class="sumrow"><span>Delivery fee</span><span>฿40</span></div>
+    <div class="sumrow total"><span>Total</span><span>฿${state.delivery.total}</span></div>`;
+}
+function advanceDelivery(){
+  if(state.delivery.stepIndex < DELIVERY_STEPS.length-1){
+    state.delivery.stepIndex++;
+    renderDeliveryTracker();
+  } else {
+    completeOrder(state.delivery);
+    toast('Delivered — thanks for rescuing food with REfood! 🌱');
+    go('c-home');
+  }
+}
+
+/* ============================================================
+   CHAT (rider + staff) — client-side only
+   ============================================================ */
+const riderMessages = [
+  {from:'them', text:"Hi! I've got your order and I'm heading your way 🛵"},
+];
+function renderRiderChat(){
+  document.getElementById('rider-chatlog').innerHTML = riderMessages.map(m=>`<div class="bubble ${m.from==='me'?'me':'them'}">${m.text}</div>`).join('');
+}
+function sendRiderMsg(){
+  const input = document.getElementById('rider-chat-input');
+  const val = input.value.trim();
+  if(!val) return;
+  riderMessages.push({from:'me', text:val});
+  input.value='';
+  renderRiderChat();
+  setTimeout(()=>{ riderMessages.push({from:'them', text:"Got it, thanks! 😊"}); renderRiderChat(); }, 700);
+}
+
+const staffMessages = [
+  {from:'them', text:"Hi there! This is REfood support — how can we help today?"},
+];
+function renderStaffChat(){
+  document.getElementById('staff-chatlog').innerHTML = staffMessages.map(m=>`<div class="bubble ${m.from==='me'?'me':'them'}">${m.text}</div>`).join('');
+}
+function openStaffChat(){ renderStaffChat(); openOverlay('staffChatOverlay'); }
+function closeStaffChat(){ closeOverlay('staffChatOverlay'); }
+function sendStaffMsg(){
+  const input = document.getElementById('staff-chat-input');
+  const val = input.value.trim();
+  if(!val) return;
+  staffMessages.push({from:'me', text:val});
+  input.value='';
+  renderStaffChat();
+  setTimeout(()=>{ staffMessages.push({from:'them', text:"Thanks for the message! Our team will follow up shortly."}); renderStaffChat(); }, 700);
+}
+
+/* ============================================================
+   CUSTOMER: SETTINGS / PROFILE
+   ============================================================ */
+function renderCustomerSettings(){
+  document.getElementById('c-set-name').textContent = state.customer.name;
+  document.getElementById('c-set-email').textContent = state.customer.email;
+  document.getElementById('c-set-address').textContent = state.customer.location;
+  document.getElementById('c-set-avatar').innerHTML = state.customer.photo?`<img src="${state.customer.photo}">`:'<i class="ti ti-user"></i>';
+  const r = state.customer.rescue;
+  document.getElementById('c-set-rescue-summary').textContent = `${r.points} points · ${r.itemsRescued} items rescued`;
+  document.getElementById('darkSwitchCustomer').classList.toggle('on', state.dark);
+}
+
+/* ============================================================
+   CUSTOMER: FOOD PREFERENCES (Feature 5)
+   ============================================================ */
+function renderPreferencesScreen(){
+  document.getElementById('pref-likes').innerHTML = PREF_LIKES.map(l=>`
+    <label class="prefchk"><input type="checkbox" value="${l}" ${state.customer.prefs.likes.includes(l)?'checked':''}> ${l}</label>
+  `).join('');
+  document.getElementById('pref-avoids').innerHTML = PREF_AVOIDS.map(a=>`
+    <label class="prefchk"><input type="checkbox" value="${a}" ${state.customer.prefs.avoids.includes(a)?'checked':''}> ${a}</label>
+  `).join('');
+  // right after signup there's no settings history yet, so send "back" straight home
+  document.getElementById('pref-back-btn').setAttribute('onclick', state.customer._justSignedUp ? "go('c-home')" : "go('c-settings')");
+}
+function savePreferences(){
+  const likes = Array.from(document.querySelectorAll('#pref-likes input:checked')).map(i=>i.value);
+  const avoids = Array.from(document.querySelectorAll('#pref-avoids input:checked')).map(i=>i.value);
+  state.customer.prefs = {likes, avoids};
+  toast('Preferences saved');
+  if(state.customer._justSignedUp){ state.customer._justSignedUp = false; go('c-home'); }
+  else { go('c-settings'); }
+}
+
+/* ============================================================
+   CUSTOMER: FOLLOWED SHOPS (Feature 6)
+   ============================================================ */
+function toggleFollow(shopId){
+  const idx = state.customer.followedShopIds.indexOf(shopId);
+  if(idx>-1){ state.customer.followedShopIds.splice(idx,1); toast('Unfollowed'); }
+  else { state.customer.followedShopIds.push(shopId); toast("Following — you'll be notified of new surplus"); }
+  const isFollowed = state.customer.followedShopIds.includes(shopId);
+  document.getElementById('sd-follow-btn').innerHTML = `<i class="ti ${isFollowed?'ti-heart-filled':'ti-heart'}"></i>`;
+}
+function renderFollowList(){
+  const shops = SHOPS.filter(s=>state.customer.followedShopIds.includes(s.id));
+  const list = document.getElementById('c-follow-list');
+  if(shops.length===0){
+    list.innerHTML = `<div class="emptystate"><i class="ti ti-heart"></i><p>You're not following any shops yet. Follow a shop from its page to get notified of new surplus.</p></div>`;
+    return;
+  }
+  list.innerHTML = shops.map(s=>`
+    <div class="itemcard">
+      <div class="thumb"><i class="ti ${s.icon}"></i></div>
+      <div class="body">
+        <div class="name">${s.name}</div>
+        <div class="meta" style="margin-top:4px;"><span class="badgepill plenty" style="background:var(--tint);color:var(--primary-darker)">${s.distance}</span></div>
+        <div class="rowbtns">
+          <button class="iconlink" onclick="openShop(${s.id})"><i class="ti ti-eye"></i>View shop</button>
+          <button class="iconlink del" onclick="toggleFollow(${s.id});renderFollowList();"><i class="ti ti-heart-off"></i>Unfollow</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ============================================================
+   CUSTOMER: ORDERS
+   ============================================================ */
+function renderOrdersList(){
+  const orders = state.customer.orderHistory;
+  const list = document.getElementById('c-orders-list');
+  if(orders.length===0){
+    list.innerHTML = `<div class="emptystate"><i class="ti ti-receipt-off"></i><p>No orders yet. Rescue something delicious!</p></div>`;
+    return;
+  }
+  list.innerHTML = orders.map(o=>`
+    <button class="card" style="width:100%;text-align:left;padding:14px;display:flex;align-items:center;gap:12px;" onclick="openOrder('${o.id}')">
+      <div class="iconcircle"><i class="ti ${o.type==='delivery'?'ti-motorbike':'ti-shopping-bag'}"></i></div>
+      <div style="flex:1">
+        <div style="font-weight:800;font-size:13.5px;">${o.shop}</div>
+        <div style="font-size:11.5px;color:var(--muted);margin-top:2px;">${o.items.reduce((a,c)=>a+c.qty,0)} items · ฿${o.total} · ${o.type}</div>
+      </div>
+      <span class="badgepill ${o.status==='active'?'soon':'plenty'}">${o.status==='active'?'In progress':'Completed'}</span>
+    </button>
+  `).join('');
+}
+function openOrder(id){
+  const o = state.customer.orderHistory.find(x=>String(x.id)===String(id));
+  if(!o) return;
+  if(o.status==='active'){
+    if(o.type==='delivery'){ renderDeliveryTracker(); go('order-delivery'); }
+    else { renderPickupTracker(); go('order-pickup'); }
+    return;
+  }
+  document.getElementById('od-title').textContent = `${o.shop} · ${o.type==='delivery'?'Delivery':'Pickup'}`;
+  document.getElementById('od-body').innerHTML = `
+    ${o.items.map(c=>`<div class="sumrow"><span>${c.name} x${c.qty}</span><span>฿${c.price*c.qty}</span></div>`).join('')}
+    <div class="sumrow total"><span>Total</span><span>฿${o.total}</span></div>
+    <p style="margin-top:10px;font-size:12px;color:var(--muted);">This order is complete.</p>
+  `;
+  openOverlay('orderDetailOverlay');
+}
+
+/* ============================================================
+   CUSTOMER: RESCUE SCORE (Feature 9 & 10)
+   ============================================================ */
+function renderRescueScreen(){
+  const r = state.customer.rescue;
+  let tier = 'Not yet a Rescuer', next = 'Rescue 10 items to become a Bronze Rescuer', pct = Math.min(100, r.itemsRescued/10*100);
+  if(r.itemsRescued>=60){ tier='GOLD RESCUER'; next='You\'ve reached the top tier — thank you!'; pct=100; }
+  else if(r.itemsRescued>=30){ tier='SILVER RESCUER'; next=`${60-r.itemsRescued} rescues to Gold Rescuer`; pct=(r.itemsRescued-30)/30*100; }
+  else if(r.itemsRescued>=10){ tier='BRONZE RESCUER'; next=`${30-r.itemsRescued} rescues to Silver Rescuer`; pct=(r.itemsRescued-10)/20*100; }
+  document.getElementById('rs-tier').textContent = tier;
+  document.getElementById('rs-points').innerHTML = `${r.points} <span>points</span>`;
+  document.getElementById('rs-summary').textContent = `You rescued ${r.itemsRescued} items · saved ฿${r.moneySaved}`;
+  document.getElementById('rs-tierfill').style.width = Math.max(4,pct)+'%';
+  document.getElementById('rs-tiernext').textContent = next;
+  document.getElementById('rs-streak').innerHTML = Array.from({length:7}).map((_,i)=>`<div class="d ${i<r.streak?'on':''}">${i<r.streak?'<i class=\"ti ti-flame\"></i>':''}</div>`).join('');
+}
+
+/* ============================================================
+   MERCHANT: CANCEL SUBSCRIPTION
+   ============================================================ */
+function cancelSubscription(){
+  state.merchant.premium = false;
+  closeOverlay('cancelSubOverlay');
+  fillMerchantSettings();
+  toast('Premium subscription cancelled');
+}
+
+/* ---------- init ---------- */
+go('splash');
+</script>
+</body>
+</html>
