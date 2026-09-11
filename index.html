@@ -300,7 +300,8 @@ td{padding:11px 12px;border-top:1px solid var(--border);}
 .sendbtn{width:42px;height:42px;border-radius:50%;background:var(--primary);color:#fff;border:none;flex-shrink:0;font-size:16px;}
 
 /* splash */
-.splash{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px;background:linear-gradient(180deg,var(--tint),var(--bg) 60%);}
+.splash{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px;background:linear-gradient(180deg,var(--tint),var(--bg) 60%);position:relative;}
+.splash .splashback{position:absolute;top:20px;left:20px;}
 .splash .logo{width:88px;height:88px;border-radius:26px;display:flex;align-items:center;justify-content:center;font-size:42px;color:#fff;margin-bottom:16px;box-shadow:var(--shadow-lift);}
 .splash h1{font-size:26px;}
 .splash p{color:var(--muted);font-size:13.5px;margin-top:8px;max-width:280px;}
@@ -397,7 +398,21 @@ td{padding:11px 12px;border-top:1px solid var(--border);}
 .lmerchant .mvisual .row{display:flex;justify-content:space-between;font-size:11.5px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.18);}
 .lmerchant .mvisual .row:last-child{border-bottom:none;}
 
-.lfooter{border-top:1px solid var(--border);padding:36px 24px;}
+.lmerchant.customerband{background:linear-gradient(135deg,var(--coral-dark),var(--coral));}
+.lmerchant.customerband .lbtn-primary{color:var(--coral-dark);}
+
+.lpricing{display:grid;grid-template-columns:1fr;gap:18px;margin-top:36px;}
+@media (min-width:760px){.lpricing{grid-template-columns:repeat(3,1fr);}}
+.lprice{background:var(--surface);border:1.5px solid var(--border);border-radius:20px;padding:26px;display:flex;flex-direction:column;}
+.lprice.featured{border-color:var(--primary);box-shadow:0 8px 24px rgba(20,184,166,0.14);position:relative;}
+.lprice .ltag{position:absolute;top:-11px;left:22px;background:var(--primary);color:#fff;font-size:10.5px;font-weight:800;padding:4px 10px;border-radius:8px;}
+.lprice .lwho{font-size:11.5px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;}
+.lprice .lprice-amt{font-size:28px;font-weight:900;margin-top:8px;color:var(--text);}
+.lprice .lprice-amt span{font-size:12px;font-weight:700;color:var(--muted);}
+.lprice ul{list-style:none;margin:18px 0 0;padding:0;display:flex;flex-direction:column;gap:9px;flex:1;}
+.lprice li{font-size:12.5px;color:var(--muted);display:flex;gap:8px;align-items:flex-start;line-height:1.4;}
+.lprice li i{color:var(--primary);margin-top:2px;flex-shrink:0;}
+.lprice .lbtn{margin-top:20px;width:100%;}
 .lfooter .finner{max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:20px;}
 @media (min-width:760px){.lfooter .finner{flex-direction:row;justify-content:space-between;align-items:flex-start;}}
 .lfooter .fbrand{display:flex;align-items:center;gap:8px;font-weight:800;color:var(--text);}
@@ -434,7 +449,9 @@ td{padding:11px 12px;border-top:1px solid var(--border);}
           <div class="lnavlinks">
             <a onclick="scrollToSection('l-how')">How it works</a>
             <a onclick="scrollToSection('l-features')">Features</a>
+            <a onclick="scrollToSection('l-customers')">For Customers</a>
             <a onclick="scrollToSection('l-merchant')">For Merchants</a>
+            <a onclick="scrollToSection('l-pricing')">Pricing</a>
           </div>
           <div class="lactions">
             <button class="linktext" onclick="go('splash')">Log in</button>
@@ -479,19 +496,6 @@ td{padding:11px 12px;border-top:1px solid var(--border);}
           </div>
         </section>
 
-        <section class="lsection tight">
-          <div class="lgrid2">
-            <div class="lcard problem">
-              <h3><i class="ti ti-alert-circle" style="color:var(--coral-dark)"></i> The problem</h3>
-              <p>Every night, bakeries and restaurants across Bangkok throw away food that's still perfectly good — and nearby customers have no easy way to find these deals, right when they're happening.</p>
-            </div>
-            <div class="lcard solution">
-              <h3><i class="ti ti-bulb" style="color:var(--primary-darker)"></i> Our solution</h3>
-              <p>A live, location-based app with evening flash listings — same-day surplus from nearby shops, shown as exact items (never a mystery bag), ready for pickup or delivery by REfood's own riders.</p>
-            </div>
-          </div>
-        </section>
-
         <section class="lsection" id="l-how">
           <span class="leyebrow"><i class="ti ti-route"></i> How it works</span>
           <h2 style="font-size:26px;margin-top:12px;">From nearby shop to your table</h2>
@@ -513,6 +517,32 @@ td{padding:11px 12px;border-top:1px solid var(--border);}
             <div class="lfeat"><div class="fi"><i class="ti ti-trophy"></i></div><h4>Rescue Score &amp; rewards</h4><p>Earn points on every rescue, climb Bronze → Silver → Gold tiers, and build a 7-day rescue streak.</p></div>
             <div class="lfeat"><div class="fi"><i class="ti ti-heart"></i></div><h4>Follow your favorite shops</h4><p>Get notified the moment a shop you follow posts new surplus — no more checking back and forth.</p></div>
             <div class="lfeat"><div class="fi"><i class="ti ti-motorbike"></i></div><h4>Pickup or delivery</h4><p>Grab it yourself for free, or get it delivered by REfood's own riders — not a 3rd-party service.</p></div>
+          </div>
+        </section>
+
+        <section class="lsection" id="l-customers">
+          <div class="lmerchant customerband">
+            <div>
+              <span class="leyebrow" style="background:rgba(255,255,255,0.18);color:#fff;">For customers</span>
+              <h2 style="margin-top:12px;">Rescue food nearby, in a few taps</h2>
+              <p>Open the app, see what's nearby, and choose exactly what you want — no account needed to browse, and no surprise bags.</p>
+              <ul>
+                <li><i class="ti ti-check"></i> Browse nearby shops by category, or search directly</li>
+                <li><i class="ti ti-check"></i> See exact items, real prices, and dietary/allergen tags before you buy</li>
+                <li><i class="ti ti-check"></i> Pay with PromptPay, card, or cash — pick up for free or get it delivered</li>
+                <li><i class="ti ti-check"></i> Follow your favorite shops and get notified of new surplus</li>
+                <li><i class="ti ti-check"></i> Earn Rescue Score points, climb tiers, and unlock voucher rewards</li>
+              </ul>
+              <button class="lbtn lbtn-primary" onclick="go('splash')">Get started as a customer</button>
+            </div>
+            <div class="mvisual">
+              <div class="box">
+                <div class="row"><span>Rescue Score</span><span>230 pts</span></div>
+                <div class="row"><span>Items rescued</span><span>23</span></div>
+                <div class="row"><span>Money saved</span><span>฿1,250</span></div>
+                <div class="row" style="border:none;font-weight:800;"><span>Tier</span><span>Bronze Rescuer</span></div>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -541,6 +571,47 @@ td{padding:11px 12px;border-top:1px solid var(--border);}
           </div>
         </section>
 
+        <section class="lsection" id="l-pricing">
+          <span class="leyebrow"><i class="ti ti-tag"></i> Pricing</span>
+          <h2 style="font-size:26px;margin-top:12px;">Simple pricing on both sides</h2>
+          <div class="lpricing">
+            <div class="lprice">
+              <span class="lwho">Customers</span>
+              <div class="lprice-amt">Free <span>to browse &amp; order</span></div>
+              <ul>
+                <li><i class="ti ti-check"></i> No account needed to browse nearby deals</li>
+                <li><i class="ti ti-check"></i> Pay only for the food you order</li>
+                <li><i class="ti ti-check"></i> Pickup is always free</li>
+                <li><i class="ti ti-check"></i> Delivery adds a flat ฿40 rider fee</li>
+              </ul>
+              <button class="lbtn lbtn-outline" onclick="go('splash')">Browse deals</button>
+            </div>
+            <div class="lprice">
+              <span class="lwho">Merchant · Free</span>
+              <div class="lprice-amt">฿0 <span>/ month</span></div>
+              <ul>
+                <li><i class="ti ti-check"></i> List unlimited surplus items</li>
+                <li><i class="ti ti-check"></i> Set your own discount &amp; pickup window</li>
+                <li><i class="ti ti-check"></i> Reach nearby customers automatically</li>
+                <li><i class="ti ti-check"></i> 20% commission per item sold — no sales, no fee</li>
+              </ul>
+              <button class="lbtn lbtn-outline" onclick="go('splash')">List your shop</button>
+            </div>
+            <div class="lprice featured">
+              <span class="ltag">Most popular</span>
+              <span class="lwho">Merchant · Premium</span>
+              <div class="lprice-amt">฿299 <span>/ month</span></div>
+              <ul>
+                <li><i class="ti ti-check"></i> Everything in the Free plan</li>
+                <li><i class="ti ti-check"></i> Today's Surplus Dashboard — quantity, discount &amp; time remaining at a glance</li>
+                <li><i class="ti ti-check"></i> Waste Prediction — forecasts of tomorrow's surplus from your sales history</li>
+                <li><i class="ti ti-check"></i> Priority merchant support</li>
+              </ul>
+              <button class="lbtn lbtn-primary" onclick="go('splash')">Go Premium</button>
+            </div>
+          </div>
+        </section>
+
         <footer class="lfooter">
           <div class="finner">
             <div>
@@ -548,7 +619,7 @@ td{padding:11px 12px;border-top:1px solid var(--border);}
               <p class="ftag">No surprise. You choose what you save. A student e-business project rescuing food across Bangkok.</p>
             </div>
             <div class="lfootlinks">
-              <div class="col"><span class="h">Product</span><a onclick="scrollToSection('l-how')">How it works</a><a onclick="scrollToSection('l-features')">Features</a><a onclick="scrollToSection('l-merchant')">For merchants</a></div>
+              <div class="col"><span class="h">Product</span><a onclick="scrollToSection('l-how')">How it works</a><a onclick="scrollToSection('l-features')">Features</a><a onclick="scrollToSection('l-merchant')">For merchants</a><a onclick="scrollToSection('l-pricing')">Pricing</a></div>
               <div class="col"><span class="h">Get started</span><a onclick="go('c-login')">Customer log in</a><a onclick="go('m-login')">Merchant log in</a></div>
             </div>
           </div>
@@ -561,6 +632,7 @@ td{padding:11px 12px;border-top:1px solid var(--border);}
     <!-- ===================== SPLASH ===================== -->
     <section class="view" id="view-splash">
       <div class="splash">
+        <button class="backbtn splashback" onclick="go('home')"><i class="ti ti-chevron-left"></i></button>
         <div class="logo"><img src="SplashLogo.png" alt="REfood logo"></div>
         <h1>REfood</h1>
         <p>No surprise. You choose what you save. Rescue near-expiry food from bakeries &amp; restaurants near you.</p>
