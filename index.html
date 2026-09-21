@@ -568,8 +568,8 @@ td{padding:11px 12px;border-top:1px solid var(--border);}
         <nav class="lnav">
           <div class="lbrand"><img src="images/SplashLogo.png" alt="REfood logo"> REfood</div>
           <div class="lnavlinks">
-            <a onclick="scrollToSection('l-how')">How it works</a>
             <a onclick="scrollToSection('l-features')">Features</a>
+            <a onclick="scrollToSection('l-how')">How it works</a>
             <a onclick="scrollToSection('l-customers')">For Customers</a>
             <a onclick="scrollToSection('l-merchant')">For Merchants</a>
             <a onclick="scrollToSection('l-pricing')">Pricing</a>
@@ -589,8 +589,8 @@ td{padding:11px 12px;border-top:1px solid var(--border);}
               <h1>Great food, saved <span>before it's gone.</span></h1>
               <p class="lead">REfood connects Bangkok's bakeries &amp; restaurants with nearby customers for near-expiry surplus — real items you can see, real discounts, ready for pickup or delivery the same evening.</p>
               <div class="lheroCTA">
-                <button class="lbtn lbtn-primary" onclick="go('splash')"><i class="ti ti-map-pin"></i> Browse deals near you</button>
-                <button class="lbtn lbtn-outline" onclick="go('splash')"><i class="ti ti-building-store"></i> List your surplus</button>
+                <button class="lbtn lbtn-primary" onclick="go('c-login')"><i class="ti ti-map-pin"></i> Browse deals near you</button>
+                <button class="lbtn lbtn-outline" onclick="go('m-login')"><i class="ti ti-building-store"></i> List your surplus</button>
               </div>
               <div class="ltrustrow">
                 <div class="titem"><div class="ticon" style="color:#E85C7A;"><i class="ti ti-pig"></i></div><span>20–80% off</span></div>
@@ -658,19 +658,8 @@ td{padding:11px 12px;border-top:1px solid var(--border);}
           </div>
         </section>
 
-        <section class="lsection" id="l-how">
-          <div class="ldecor ldots" style="top:0;right:20px;"></div>
-          <span class="leyebrow"><i class="ti ti-route"></i> How it works</span>
-          <h2 style="font-size:26px;margin-top:12px;">From nearby shop to your table</h2>
-          <div class="lsteps">
-            <div class="lstep"><div class="stepline"><span class="stepnum-big" style="color:#0B7A6A;">1</span></div><img class="stepimg" src="images/Discover.png" alt="Discover nearby shops"><h4>Discover</h4><p>See nearby shops with surplus deals, filtered by category and what's rescuable right now.</p></div>
-            <div class="lstep"><div class="stepline"><span class="stepnum-big" style="color:#D9822B;">2</span></div><img class="stepimg" src="images/browse-filter.png" alt="Browse and filter items"><h4>Browse &amp; filter</h4><p>Exact items, real prices, and dietary tags — filter by what you actually like or avoid.</p></div>
-            <div class="lstep"><div class="stepline"><span class="stepnum-big" style="color:#6C5CE0;">3</span></div><img class="stepimg" src="images/order-pay.png" alt="Order and pay"><h4>Order &amp; pay</h4><p>Add to cart and pay with PromptPay, card, or cash — choose pickup or delivery.</p></div>
-            <div class="lstep"><div class="stepline"><span class="stepnum-big" style="color:#C99A10;">4</span></div><img class="stepimg" src="images/rescue-earn.png" alt="Rescue and earn rewards"><h4>Rescue &amp; earn</h4><p>Pick up or get it delivered, then earn Rescue Score points toward real rewards.</p></div>
-          </div>
-        </section>
-
         <section class="lsection" id="l-features">
+          <div class="ldecor ldots" style="top:0;right:20px;"></div>
           <span class="leyebrow"><i class="ti ti-sparkles"></i> Why REfood</span>
           <h2 style="font-size:26px;margin-top:12px;">Transparent, affordable, and built for Bangkok</h2>
           <div class="lfeatgrid">
@@ -680,6 +669,17 @@ td{padding:11px 12px;border-top:1px solid var(--border);}
             <div class="lfeat"><div class="fi" style="background:#FBF0CC;color:#C99A10;"><i class="ti ti-trophy"></i></div><h4>Rescue Score &amp; rewards</h4><p>Earn points on every rescue, climb Bronze → Silver → Gold tiers, and build a 7-day rescue streak.</p></div>
             <div class="lfeat"><div class="fi" style="background:#FFE1E8;color:#E85C7A;"><i class="ti ti-heart"></i></div><h4>Follow your favorite shops</h4><p>Get notified the moment a shop you follow posts new surplus — no more checking back and forth.</p></div>
             <div class="lfeat"><div class="fi" style="background:#DCEAF7;color:#3B7FC4;"><i class="ti ti-motorbike"></i></div><h4>Pickup or delivery</h4><p>Grab it yourself for free, or get it delivered by REfood's own riders — not a 3rd-party service.</p></div>
+          </div>
+        </section>
+
+        <section class="lsection" id="l-how">
+          <span class="leyebrow"><i class="ti ti-route"></i> How it works</span>
+          <h2 style="font-size:26px;margin-top:12px;">From nearby shop to your table</h2>
+          <div class="lsteps">
+            <div class="lstep"><div class="stepline"><span class="stepnum-big" style="color:#0B7A6A;">1</span></div><img class="stepimg" src="images/Discover.png" alt="Discover nearby shops"><h4>Discover</h4><p>See nearby shops with surplus deals, filtered by category and what's rescuable right now.</p></div>
+            <div class="lstep"><div class="stepline"><span class="stepnum-big" style="color:#D9822B;">2</span></div><img class="stepimg" src="images/browse-filter.png" alt="Browse and filter items"><h4>Browse &amp; filter</h4><p>Exact items, real prices, and dietary tags — filter by what you actually like or avoid.</p></div>
+            <div class="lstep"><div class="stepline"><span class="stepnum-big" style="color:#6C5CE0;">3</span></div><img class="stepimg" src="images/order-pay.png" alt="Order and pay"><h4>Order &amp; pay</h4><p>Add to cart and pay with PromptPay, card, or cash — choose pickup or delivery.</p></div>
+            <div class="lstep"><div class="stepline"><span class="stepnum-big" style="color:#C99A10;">4</span></div><img class="stepimg" src="images/rescue-earn.png" alt="Rescue and earn rewards"><h4>Rescue &amp; earn</h4><p>Pick up or get it delivered, then earn Rescue Score points toward real rewards.</p></div>
           </div>
         </section>
 
@@ -696,7 +696,7 @@ td{padding:11px 12px;border-top:1px solid var(--border);}
                 <li><i class="ti ti-check"></i> Follow your favorite shops and get notified of new surplus</li>
                 <li><i class="ti ti-check"></i> Earn Rescue Score points, climb tiers, and unlock voucher rewards</li>
               </ul>
-              <button class="lbtn lbtn-primary" onclick="go('splash')">Get started as a customer</button>
+              <button class="lbtn lbtn-primary" onclick="go('c-login')">Get started as a customer</button>
             </div>
             <div class="mvisual">
               <div class="bandvisual">
@@ -724,7 +724,7 @@ td{padding:11px 12px;border-top:1px solid var(--border);}
                 <li><i class="ti ti-check"></i> Reach nearby customers automatically — no marketing needed</li>
                 <li><i class="ti ti-check"></i> Optional Premium: surplus dashboard + waste prediction</li>
               </ul>
-              <button class="lbtn lbtn-primary" onclick="go('splash')">Get started as a merchant</button>
+              <button class="lbtn lbtn-primary" onclick="go('m-login')">Get started as a merchant</button>
             </div>
             <div class="mvisual">
               <div class="box" style="max-width:280px;">
@@ -764,7 +764,7 @@ td{padding:11px 12px;border-top:1px solid var(--border);}
                 <li><i class="ti ti-check"></i> Pickup is always free</li>
                 <li><i class="ti ti-check"></i> Delivery adds a flat ฿40 rider fee</li>
               </ul>
-              <button class="lbtn lbtn-outline" onclick="go('splash')">Browse deals</button>
+              <button class="lbtn lbtn-outline" onclick="go('c-login')">Browse deals</button>
             </div>
             <div class="lprice">
               <span class="lwho">Merchant · Free</span>
@@ -775,7 +775,7 @@ td{padding:11px 12px;border-top:1px solid var(--border);}
                 <li><i class="ti ti-check"></i> Reach nearby customers automatically</li>
                 <li><i class="ti ti-check"></i> 20% commission per item sold — no sales, no fee</li>
               </ul>
-              <button class="lbtn lbtn-outline" onclick="go('splash')">List your shop</button>
+              <button class="lbtn lbtn-outline" onclick="go('m-login')">List your shop</button>
             </div>
             <div class="lprice featured">
               <span class="ltag">Most popular</span>
@@ -787,7 +787,7 @@ td{padding:11px 12px;border-top:1px solid var(--border);}
                 <li><i class="ti ti-check"></i> Waste Prediction — forecasts of tomorrow's surplus from your sales history</li>
                 <li><i class="ti ti-check"></i> Priority merchant support</li>
               </ul>
-              <button class="lbtn lbtn-primary" onclick="go('splash')">Go Premium</button>
+              <button class="lbtn lbtn-primary" onclick="go('m-login')">Go Premium</button>
             </div>
           </div>
         </section>
