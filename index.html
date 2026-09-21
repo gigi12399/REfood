@@ -15,6 +15,7 @@
   --primary-darker:#0B7A6A;
   --secondary:#5EEAD4;
   --tint:#DFF5EF;
+  --light-tint: #f1fffb;
   --bg:#F7FBF9;
   --surface:#FFFFFF;
   --coral:#FF8F6B;
@@ -401,6 +402,7 @@ td{padding:11px 12px;border-top:1px solid var(--border);}
 .lpreview .ph-card .tx .p{font-size:10px;margin-top:2px;}
 .lpreview .ph-card .tx .p .o{color:var(--muted);text-decoration:line-through;margin-right:4px;}
 .lpreview .ph-card .tx .p .d{color:var(--coral-dark);font-weight:800;}
+.lpreview .ph-card .ph-tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:3px;}
 .lpreview .ph-badge{font-size:9px;font-weight:800;background:var(--danger-tint);color:var(--danger-text);padding:2px 6px;border-radius:7px;flex-shrink:0;}
 
 .lgrid2{display:grid;grid-template-columns:1fr;gap:18px;}
@@ -629,17 +631,17 @@ td{padding:11px 12px;border-top:1px solid var(--border);}
               <div class="ph-head"><span class="l"><i class="ti ti-map-pin"></i> Sukhumvit, Bangkok</span><i class="ti ti-bell" style="color:var(--muted)"></i></div>
               <div class="ph-card">
                 <div class="ic"><i class="ti ti-bread"></i></div>
-                <div class="tx"><div class="n">S&amp;P Bakery · 0.8 km</div><div class="p"><span class="o">฿120</span><span class="d">฿60</span></div></div>
+                <div class="tx"><div class="n">S&amp;P Bakery · 0.8 km</div><div class="p"><span class="o">฿120</span><span class="d">฿60</span></div><div class="ph-tags"><span class="tagpill" style="background-color: var(--light-tint);">Vegetarian</span><span class="tagpill" style="background-color: var(--light-tint);">Contains dairy</span></div></div>
                 <span class="ph-badge">4h left</span>
               </div>
               <div class="ph-card">
                 <div class="ic"><i class="ti ti-salad"></i></div>
-                <div class="tx"><div class="n">Green Bowl · 1.2 km</div><div class="p"><span class="o">฿180</span><span class="d">฿90</span></div></div>
+                <div class="tx"><div class="n">Green Bowl · 1.2 km</div><div class="p"><span class="o">฿180</span><span class="d">฿90</span></div><div class="ph-tags"><span class="tagpill" style="background-color: var(--light-tint);">Vegetarian</span><span class="tagpill" style="background-color: var(--light-tint);">Healthy</span></div></div>
                 <span class="ph-badge" style="background:var(--amber-tint);color:var(--amber)">2d left</span>
               </div>
               <div class="ph-card" style="margin-bottom:0;">
                 <div class="ic"><i class="ti ti-fish"></i></div>
-                <div class="tx"><div class="n">Sakura Sushi · 1.5 km</div><div class="p"><span class="o">฿220</span><span class="d">฿110</span></div></div>
+                <div class="tx"><div class="n">Sakura Sushi · 1.5 km</div><div class="p"><span class="o">฿220</span><span class="d">฿110</span></div><div class="ph-tags"><span class="tagpill" style="background-color: var(--light-tint);">Contains seafood</span></div></div>
                 <span class="ph-badge" style="background:var(--green-ok-tint);color:var(--green-ok)">1d left</span>
               </div>
             </div>
